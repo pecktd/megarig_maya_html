@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>megarig_maya.move_pivot_tool &mdash; megarig_maya  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            megarig_maya
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../megarig_maya.html">megarig_maya package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">megarig_maya</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">megarig_maya.move_pivot_tool</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for megarig_maya.move_pivot_tool</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Maya modules</span>
+<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">maya.OpenMaya</span> <span class="k">as</span> <span class="nn">om</span>
+
+
+<div class="viewcode-block" id="dag_path_from_str"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.move_pivot_tool.dag_path_from_str">[docs]</a><span class="k">def</span> <span class="nf">dag_path_from_str</span><span class="p">(</span><span class="n">dag_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">:</span>
+    <span class="n">sellist</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+    <span class="n">sellist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dag_str</span><span class="p">)</span>
+    <span class="n">mdag_path</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">()</span>
+    <span class="n">sellist</span><span class="o">.</span><span class="n">getDagPath</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mdag_path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdag_path</span></div>
+
+
+<div class="viewcode-block" id="get_offset_translation"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.move_pivot_tool.get_offset_translation">[docs]</a><span class="k">def</span> <span class="nf">get_offset_translation</span><span class="p">(</span>
+    <span class="n">matrix</span><span class="p">:</span> <span class="n">om</span><span class="o">.</span><span class="n">MTransformationMatrix</span><span class="p">,</span> <span class="n">inverse_matrix</span><span class="p">:</span> <span class="n">om</span><span class="o">.</span><span class="n">MTransformationMatrix</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">:</span>
+    <span class="n">result_mat</span> <span class="o">=</span> <span class="n">matrix</span> <span class="o">*</span> <span class="n">inverse_matrix</span>
+    <span class="k">return</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">(</span>
+        <span class="n">om</span><span class="o">.</span><span class="n">MScriptUtil</span><span class="o">.</span><span class="n">getDoubleArrayItem</span><span class="p">(</span><span class="n">result_mat</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">om</span><span class="o">.</span><span class="n">MScriptUtil</span><span class="o">.</span><span class="n">getDoubleArrayItem</span><span class="p">(</span><span class="n">result_mat</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">om</span><span class="o">.</span><span class="n">MScriptUtil</span><span class="o">.</span><span class="n">getDoubleArrayItem</span><span class="p">(</span><span class="n">result_mat</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="move_pivot"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.move_pivot_tool.move_pivot">[docs]</a><span class="k">def</span> <span class="nf">move_pivot</span><span class="p">(</span><span class="n">dag_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pivot_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Match the rotate pivot of the given object to the position of the given</span>
+<span class="sd">    pivot node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">currentTime</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">dag</span> <span class="o">=</span> <span class="n">dag_path_from_str</span><span class="p">(</span><span class="n">dag_name</span><span class="p">)</span>
+    <span class="n">piv</span> <span class="o">=</span> <span class="n">dag_path_from_str</span><span class="p">(</span><span class="n">pivot_name</span><span class="p">)</span>
+
+    <span class="n">mc</span><span class="o">.</span><span class="n">setKeyframe</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">(),</span> <span class="n">t</span><span class="o">=</span><span class="p">[</span><span class="n">ct</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ct</span><span class="p">],</span> <span class="n">i</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">an</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">piv_vec</span> <span class="o">=</span> <span class="n">get_offset_translation</span><span class="p">(</span>
+        <span class="n">piv</span><span class="o">.</span><span class="n">inclusiveMatrix</span><span class="p">(),</span> <span class="n">dag</span><span class="o">.</span><span class="n">inclusiveMatrixInverse</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="n">pre_mod_vec</span> <span class="o">=</span> <span class="n">get_offset_translation</span><span class="p">(</span>
+        <span class="n">dag</span><span class="o">.</span><span class="n">inclusiveMatrix</span><span class="p">(),</span> <span class="n">dag</span><span class="o">.</span><span class="n">exclusiveMatrixInverse</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="n">mc</span><span class="o">.</span><span class="n">setKeyframe</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">(),</span> <span class="n">at</span><span class="o">=</span><span class="s2">&quot;rp&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="p">[</span><span class="n">ct</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ott</span><span class="o">=</span><span class="s2">&quot;step&quot;</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.rp&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">piv_vec</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">setKeyframe</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">(),</span> <span class="n">at</span><span class="o">=</span><span class="s2">&quot;rp&quot;</span><span class="p">,</span> <span class="n">ott</span><span class="o">=</span><span class="s2">&quot;step&quot;</span><span class="p">)</span>
+
+    <span class="n">mod_vec</span> <span class="o">=</span> <span class="n">get_offset_translation</span><span class="p">(</span>
+        <span class="n">dag</span><span class="o">.</span><span class="n">inclusiveMatrix</span><span class="p">(),</span> <span class="n">dag</span><span class="o">.</span><span class="n">exclusiveMatrixInverse</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">offset_rpt_vec</span> <span class="o">=</span> <span class="n">pre_mod_vec</span> <span class="o">-</span> <span class="n">mod_vec</span>
+
+    <span class="n">rpt</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">(</span><span class="o">*</span><span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.rpt&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">mc</span><span class="o">.</span><span class="n">setKeyframe</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">(),</span> <span class="n">at</span><span class="o">=</span><span class="s2">&quot;rpt&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="p">[</span><span class="n">ct</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ott</span><span class="o">=</span><span class="s2">&quot;step&quot;</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.rpt&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="n">rpt</span> <span class="o">+</span> <span class="n">offset_rpt_vec</span><span class="p">))</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">setKeyframe</span><span class="p">(</span><span class="n">dag</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">(),</span> <span class="n">at</span><span class="o">=</span><span class="s2">&quot;rpt&quot;</span><span class="p">,</span> <span class="n">ott</span><span class="o">=</span><span class="s2">&quot;step&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="move_selected_pivot"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.move_pivot_tool.move_selected_pivot">[docs]</a><span class="k">def</span> <span class="nf">move_selected_pivot</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Select pivot node then a transform node.</span>
+<span class="sd">    Script matches the rotate pivot of the selected transform node to</span>
+<span class="sd">    the selected pivot node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sels</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">sl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">move_pivot</span><span class="p">(</span><span class="n">sels</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>megarig_maya.core &mdash; megarig_maya  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            megarig_maya
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../megarig_maya.html">megarig_maya package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">megarig_maya</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">megarig_maya.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for megarig_maya.core</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Python modules.</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">dataclasses</span>
+
+<span class="c1"># Maya modules.</span>
+<span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="kn">import</span> <span class="nn">maya.OpenMaya</span> <span class="k">as</span> <span class="nn">om</span>
+
+<span class="c1"># megarig modules.</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">naming_tools</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">curve_param</span>
+
+
+<span class="n">SKIN_SET</span> <span class="o">=</span> <span class="s2">&quot;skin_set&quot;</span>
+<span class="n">FACIAL_SKIN_SET</span> <span class="o">=</span> <span class="s2">&quot;faial_skin_set&quot;</span>
+
+
+<div class="viewcode-block" id="Operator"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Operator">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">Operator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Operators on utility nodes.&quot;&quot;&quot;</span>
+
+    <span class="c1"># plusMinusAverage</span>
+    <span class="n">no_operation</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">subtract</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">average</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># multiplyDivide</span>
+    <span class="n">multiply</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">divide</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">power</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># condition</span>
+    <span class="n">equal</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">not_equal</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">greater_than</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">greater_or_equal</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">less_than</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">less_or_equal</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c1"># vectorProduct</span>
+    <span class="n">no</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dot</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">cross</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">vector_mat</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">point_mat</span> <span class="o">=</span> <span class="mi">4</span></div>
+
+
+<span class="n">Op</span> <span class="o">=</span> <span class="n">Operator</span>
+
+
+<div class="viewcode-block" id="Side"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Side">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">Side</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specifies side of the rig component.&quot;&quot;&quot;</span>
+
+    <span class="n">left</span> <span class="o">=</span> <span class="s2">&quot;l&quot;</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="s2">&quot;r&quot;</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Ro"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Ro">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">Ro</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rotate orders.&quot;&quot;&quot;</span>
+
+    <span class="n">xyz</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">yzx</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">zxy</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">xzy</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">yxz</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">zyx</span> <span class="o">=</span> <span class="mi">5</span></div>
+
+
+<div class="viewcode-block" id="Color"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Color">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">Color</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Indices of colors those are used in megarig module.&quot;&quot;&quot;</span>
+
+    <span class="n">green</span> <span class="o">=</span> <span class="mi">14</span>
+    <span class="n">soft_green</span> <span class="o">=</span> <span class="mi">26</span>
+    <span class="n">dark_green</span> <span class="o">=</span> <span class="mi">7</span>
+
+    <span class="n">yellow</span> <span class="o">=</span> <span class="mi">17</span>
+    <span class="n">soft_yellow</span> <span class="o">=</span> <span class="mi">21</span>
+    <span class="n">dark_yellow</span> <span class="o">=</span> <span class="mi">25</span>
+
+    <span class="n">blue</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">soft_blue</span> <span class="o">=</span> <span class="mi">18</span>
+    <span class="n">dark_blue</span> <span class="o">=</span> <span class="mi">15</span>
+
+    <span class="n">gray</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">soft_gray</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">dark_gray</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">red</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">soft_red</span> <span class="o">=</span> <span class="mi">31</span>
+    <span class="n">dark_red</span> <span class="o">=</span> <span class="mi">12</span>
+
+    <span class="n">black</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">white</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">brown</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">pink</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="DrawStyle"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.DrawStyle">[docs]</a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">DrawStyle</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw style attribute values on joint node.&quot;&quot;&quot;</span>
+
+    <span class="n">bone</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+<span class="n">Ds</span> <span class="o">=</span> <span class="n">DrawStyle</span>
+
+<span class="n">Cp</span> <span class="o">=</span> <span class="n">curve_param</span><span class="o">.</span><span class="n">CurveParam</span>
+
+
+<span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Forward declaration&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">Dag</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Forward declaration&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="Attr"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Attr">[docs]</a><span class="k">class</span> <span class="nc">Attr</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;For &quot;node.attribute&quot; &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">attr_str</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">attr_str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([_a-zA-Z0-9]+)&quot;</span><span class="p">,</span> <span class="n">tokens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">attributeQuery</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">listChildren</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Connects current attribute to the target.&quot;&quot;&quot;</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">connectAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;disconnects current attribute to the target.&quot;&quot;&quot;</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">disconnectAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets current attribute and its children using mc.setAttr</span>
+<span class="sd">        with the given args and kwargs.</span>
+
+<span class="sd">        If a type of current attribute is typed,</span>
+<span class="sd">        sets the attribute in a string format.</span>
+
+<span class="sd">        If current attribute doesn&#39;t have children attrbutes,</span>
+<span class="sd">        simply use setAttr command.</span>
+
+<span class="sd">        If current attribute has children attributes.</span>
+<span class="sd">        Checks first if no args assigned, sets the attribute properties</span>
+<span class="sd">        else sets the attribute values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;typed&quot;</span><span class="p">:</span>
+            <span class="c1"># In case of current attribtue type is string.</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+                <span class="c1"># Setting properties of attribute, e.g. sets lock and hide.</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                    <span class="n">current_attr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{node_attr}</span><span class="s2">.</span><span class="si">{child_attr}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">node_attr</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">child_attr</span><span class="o">=</span><span class="n">child</span>
+                    <span class="p">)</span>
+                    <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="n">current_attr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">):</span>
+                    <span class="c1"># Checks the length of given args(values).</span>
+                    <span class="c1"># It needs to match with the length of children attributes.</span>
+                    <span class="k">for</span> <span class="n">sub_val</span><span class="p">,</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">):</span>
+                        <span class="n">current_attr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{node_attr}</span><span class="s2">.</span><span class="si">{child_attr}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">node_attr</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">child_attr</span><span class="o">=</span><span class="n">child</span>
+                        <span class="p">)</span>
+                        <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="n">current_attr</span><span class="p">,</span> <span class="n">sub_val</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Mismatch of lengthes between assigning values&quot;</span>
+                        <span class="o">+</span> <span class="s2">&quot; and children attributes.&quot;</span>
+                    <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;typed&quot;</span><span class="p">:</span>
+            <span class="c1"># For array type attrbute.</span>
+            <span class="k">return</span> <span class="n">val</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setter</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@lock</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setter</span><span class="p">(</span><span class="n">lock</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hide</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@hide</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">hide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setter</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="ow">not</span> <span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setter</span><span class="p">(</span><span class="n">cb</span><span class="o">=</span><span class="ow">not</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">attributeQuery</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">attributeType</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">attributeQuery</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">ex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Attr.connections"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Attr.connections">[docs]</a>    <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cons</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">Dag</span><span class="p">(</span><span class="n">con</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">is_transform</span><span class="p">(</span><span class="n">con</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_shape</span><span class="p">(</span><span class="n">con</span><span class="p">))</span> <span class="k">else</span> <span class="n">Node</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">cons</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="Attr.get_input"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Attr.get_input">[docs]</a>    <span class="k">def</span> <span class="nf">get_input</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Attr&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cons</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Attr</span><span class="p">(</span><span class="n">cons</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Attr.get_output"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Attr.get_output">[docs]</a>    <span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Attr&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets only the first plug of the out plugs.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Attr/None:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cons</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cons</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Attr</span><span class="p">(</span><span class="n">cons</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="Node"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Node">[docs]</a><span class="k">class</span> <span class="nc">Node</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all nodes in megarig&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> does not exist.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_list</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_object</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MObject</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_list</span><span class="o">.</span><span class="n">getDependNode</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_object</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn_dependency_node</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnDependencyNode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_object</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn_dependency_node</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Node.attr"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Node.attr">[docs]</a>    <span class="k">def</span> <span class="nf">attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Attr</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instances Attr object to the given attr_str.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attr_str (str): A name of a node&#39;s attribute.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Attr:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Attr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{node}</span><span class="s2">.</span><span class="si">{attr}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr_str</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Node.add"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Node.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Attr</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds an attribute using addAttr command.&quot;&quot;&quot;</span>
+        <span class="n">attrname</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;ln&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">attrname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;ln&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s2">&quot;longName&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">attrname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;longName&quot;</span><span class="p">]</span>
+
+        <span class="n">mc</span><span class="o">.</span><span class="n">addAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">attrname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Node.lhattrs"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Node.lhattrs">[docs]</a>    <span class="k">def</span> <span class="nf">lhattrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Locks and hides given attributes.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Node.get_side"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Node.get_side">[docs]</a>    <span class="k">def</span> <span class="nf">get_side</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Side</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets side of the current node.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Side/None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">naming_tools</span><span class="o">.</span><span class="n">is_legal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">naming_tools</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="n">Side</span><span class="o">.</span><span class="n">left</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Side</span><span class="o">.</span><span class="n">left</span>
+        <span class="k">elif</span> <span class="n">side</span> <span class="o">==</span> <span class="n">Side</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Side</span><span class="o">.</span><span class="n">right</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="Dag"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag">[docs]</a><span class="k">class</span> <span class="nc">Dag</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all DAG objects in megarig.</span>
+<span class="sd">    Casts existed Maya node to megarig Dag nobject.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Dag</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">m_dag_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">:</span>
+        <span class="n">mdagpath</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_list</span><span class="o">.</span><span class="n">getDagPath</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mdagpath</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mdagpath</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fn_dag_node</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnDagNode</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnDagNode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">partialPathName</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">partialPathName</span><span class="p">()</span>
+
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">inclusiveMatrix</span><span class="p">()</span>
+        <span class="n">getarrayitem</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MScriptUtil</span><span class="o">.</span><span class="n">getDoubleArrayItem</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">getarrayitem</span><span class="p">(</span><span class="n">mat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ix</span><span class="p">)</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">inclusiveMatrix</span><span class="p">()</span>
+        <span class="n">getarrayitem</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MScriptUtil</span><span class="o">.</span><span class="n">getDoubleArrayItem</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">getarrayitem</span><span class="p">(</span><span class="n">mat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ix</span><span class="p">)</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">z_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">inclusiveMatrix</span><span class="p">()</span>
+        <span class="n">getarrayitem</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MScriptUtil</span><span class="o">.</span><span class="n">getDoubleArrayItem</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">getarrayitem</span><span class="p">(</span><span class="n">mat</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ix</span><span class="p">)</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;lineWidth&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;lineWidth&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+
+    <span class="nd">@thickness</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;lineWidth&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;lineWidth&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">v</span>
+
+<div class="viewcode-block" id="Dag.create_curve"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.create_curve">[docs]</a>    <span class="k">def</span> <span class="nf">create_curve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve_param</span><span class="p">:</span> <span class="n">Cp</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dag&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a curve shape and parent it under</span>
+<span class="sd">        current transform node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">shape</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{xform}</span><span class="s2"> already has a shape node.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xform</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">shape</span>
+
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">createNode</span><span class="p">(</span>
+            <span class="s2">&quot;nurbsCurve&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{xform}</span><span class="s2">Shape&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{node}</span><span class="s2">.v&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">shape</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">curve_param</span> <span class="o">==</span> <span class="n">Cp</span><span class="o">.</span><span class="n">nurbs_circle</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{s}</span><span class="s2">.cc&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">shape</span><span class="p">),</span>
+                <span class="mi">3</span><span class="p">,</span>
+                <span class="mi">12</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">,</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">,</span>
+                <span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
+                <span class="mi">17</span><span class="p">,</span>
+                <span class="mi">15</span><span class="p">,</span>
+                <span class="p">(</span><span class="mf">0.5234</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9065</span><span class="p">),</span>
+                <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0467</span><span class="p">),</span>
+                <span class="p">(</span><span class="o">-</span><span class="mf">0.5234</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9065</span><span class="p">),</span>
+                <span class="p">(</span><span class="o">-</span><span class="mf">0.9065</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5234</span><span class="p">),</span>
+                <span class="p">(</span><span class="o">-</span><span class="mf">1.0467</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0</span><span class="p">),</span>
+                <span class="p">(</span><span class="o">-</span><span class="mf">0.9065</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5234</span><span class="p">),</span>
+                <span class="p">(</span><span class="o">-</span><span class="mf">0.5234</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.9065</span><span class="p">),</span>
+                <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0467</span><span class="p">),</span>
+                <span class="p">(</span><span class="mf">0.5234</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.9065</span><span class="p">),</span>
+                <span class="p">(</span><span class="mf">0.9065</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5234</span><span class="p">),</span>
+                <span class="p">(</span><span class="mf">1.0467</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                <span class="p">(</span><span class="mf">0.9065</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5234</span><span class="p">),</span>
+                <span class="p">(</span><span class="mf">0.5234</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9065</span><span class="p">),</span>
+                <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0467</span><span class="p">),</span>
+                <span class="p">(</span><span class="o">-</span><span class="mf">0.5234</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9065</span><span class="p">),</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;nurbsCurve&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;</span><span class="si">{s}</span><span class="s2">.cc&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">shape</span><span class="p">),</span>
+                <span class="mi">1</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">curve_param</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">ix</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">curve_param</span><span class="p">))],</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">curve_param</span><span class="p">),</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">curve_param</span><span class="p">),</span>
+            <span class="p">]</span>
+            <span class="n">values</span> <span class="o">+=</span> <span class="n">curve_param</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;nurbsCurve&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">shape</span></div>
+
+<div class="viewcode-block" id="Dag.get_parent"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.get_parent">[docs]</a>    <span class="k">def</span> <span class="nf">get_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Dag&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a parent of current Dag.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dag if parent is a DAG, None if parent is world.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn_dag_node</span><span class="o">.</span><span class="n">parent</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="o">.</span><span class="n">apiType</span><span class="p">()</span> <span class="o">==</span> <span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kWorld</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">parentname</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnDagNode</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">parentname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.get_shape"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.get_shape">[docs]</a>    <span class="k">def</span> <span class="nf">get_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Dag&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the first shape of current Dag.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A megarig Dag of the first shape.</span>
+<span class="sd">            None if current Dag doesn&#39;t have shape node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">shapes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">shapes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Dag.get_all_shapes"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.get_all_shapes">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;Dag&quot;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">shapes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Dag</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Dag.get_orig_shape"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.get_orig_shape">[docs]</a>    <span class="k">def</span> <span class="nf">get_orig_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dag&quot;</span><span class="p">:</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="n">shape</span> <span class="o">+</span> <span class="s2">&quot;.intermediateObject&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">shapes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Dag.get_child"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.get_child">[docs]</a>    <span class="k">def</span> <span class="nf">get_child</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Dag&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the first child Dag.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dag/None:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;transform&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Dag.get_all_children"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.get_all_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_children</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Dag&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets all child Dags</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;transform&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Dag</span><span class="p">(</span><span class="n">chd</span><span class="p">)</span> <span class="k">for</span> <span class="n">chd</span> <span class="ow">in</span> <span class="n">children</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Dag.freeze"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.freeze">[docs]</a>    <span class="k">def</span> <span class="nf">freeze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">makeIdentity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.rotate"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.lhtrs"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.lhtrs">[docs]</a>    <span class="k">def</span> <span class="nf">lhtrs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Locks and hides translate, rotate and scale attributes.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hide</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{n}</span><span class="s2">.v&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="nd">@hide</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">hide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{n}</span><span class="s2">.v&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="p">),</span> <span class="ow">not</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets overrideColor of current shape.&quot;&quot;&quot;</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">shape</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{node}</span><span class="s2">.overrideColor&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">shape</span><span class="p">))</span>
+
+    <span class="nd">@color</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets override color of current shape node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (int): An index color.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">shape</span><span class="p">:</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;overrideEnabled&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;overrideColor&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rotate_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{node}</span><span class="s2">.rotateOrder&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="nd">@rotate_order</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">rotate_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Ro</span><span class="p">]):</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{node}</span><span class="s2">.rotateOrder&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">world_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">xform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@world_pos</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">world_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">xform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">world_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">world_pos</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ssc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ssc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ssc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+
+    <span class="nd">@ssc</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ssc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ssc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ssc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="c1"># Snapping methods.</span>
+<div class="viewcode-block" id="Dag.snap_point"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.snap_point">[docs]</a>    <span class="k">def</span> <span class="nf">snap_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;Dag&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Snaps position of current DAG object to target.&quot;&quot;&quot;</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">matchTransform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scl</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.snap_orient"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.snap_orient">[docs]</a>    <span class="k">def</span> <span class="nf">snap_orient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;Dag&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Snaps orientation of current DAG object to target.&quot;&quot;&quot;</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">matchTransform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scl</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.snap_scale"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.snap_scale">[docs]</a>    <span class="k">def</span> <span class="nf">snap_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;Dag&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Snaps scale of current DAG object to target.&quot;&quot;&quot;</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">matchTransform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scl</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.snap"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.snap">[docs]</a>    <span class="k">def</span> <span class="nf">snap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;Dag&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Snaps transformation of current DAG object to target.&quot;&quot;&quot;</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">matchTransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.set_parent"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.set_parent">[docs]</a>    <span class="k">def</span> <span class="nf">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;Dag&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parents current Dag to given parent node.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_object</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kShape</span><span class="p">):</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">mc</span><span class="o">.</span><span class="n">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                    <span class="c1"># If the object is already a child of the given parent.</span>
+                    <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parent</span><span class="p">():</span>
+                    <span class="n">mc</span><span class="o">.</span><span class="n">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.set_pivot"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.set_pivot">[docs]</a>    <span class="k">def</span> <span class="nf">set_pivot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the rotate and scale pivots to the given pos.&quot;&quot;&quot;</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">move</span><span class="p">(</span>
+            <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.scalePivot&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.rotatePivot&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+            <span class="n">absolute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="c1"># Shape tools.</span>
+<div class="viewcode-block" id="Dag.scale_shape"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.scale_shape">[docs]</a>    <span class="k">def</span> <span class="nf">scale_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scale current shape.&quot;&quot;&quot;</span>
+        <span class="n">compoes</span> <span class="o">=</span> <span class="n">get_all_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">piv</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">xform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">compoes</span><span class="p">,</span> <span class="n">pivot</span><span class="o">=</span><span class="n">piv</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.rotate_shape"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.rotate_shape">[docs]</a>    <span class="k">def</span> <span class="nf">rotate_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Rotates currnet shape.&quot;&quot;&quot;</span>
+        <span class="n">compoes</span> <span class="o">=</span> <span class="n">get_all_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">compoes</span><span class="p">,</span>
+            <span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">objectSpace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.move_shape"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.move_shape">[docs]</a>    <span class="k">def</span> <span class="nf">move_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Moves shape under the object space.&quot;&quot;&quot;</span>
+        <span class="n">compoes</span> <span class="o">=</span> <span class="n">get_all_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">move</span><span class="p">(</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">values</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">compoes</span><span class="p">,</span>
+            <span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">objectSpace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">worldSpaceDistance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="c1"># Attribute Tools</span>
+<div class="viewcode-block" id="Dag.disable"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.disable">[docs]</a>    <span class="k">def</span> <span class="nf">disable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Locks and hides all keyable attributes and hide its shape.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">listAttr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">shape</span><span class="p">:</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="Null"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Null">[docs]</a><span class="k">class</span> <span class="nc">Null</span><span class="p">(</span><span class="n">Dag</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A transform node.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xform</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">createNode</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="s2">&quot;null&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Null</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Locator"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Locator">[docs]</a><span class="k">class</span> <span class="nc">Locator</span><span class="p">(</span><span class="n">Dag</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A locator node.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xform</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">spaceLocator</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Locator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Joint"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Joint">[docs]</a><span class="k">class</span> <span class="nc">Joint</span><span class="p">(</span><span class="n">Dag</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A joint node.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xform</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">createNode</span><span class="p">(</span><span class="s2">&quot;joint&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Joint</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ssc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ssc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+
+    <span class="nd">@ssc</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ssc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ssc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">radi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;radi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;radi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+
+    <span class="nd">@radi</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">radi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;radi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;radi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="Controller"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Controller">[docs]</a><span class="k">class</span> <span class="nc">Controller</span><span class="p">(</span><span class="n">Dag</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;is a transform node with curve shape&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve_param</span><span class="p">:</span> <span class="n">Cp</span><span class="p">):</span>
+        <span class="n">xform</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">createNode</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="s2">&quot;control&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Controller</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">curve_param</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_curve</span><span class="p">(</span><span class="n">curve_param</span><span class="p">)</span>
+
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">xform</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">TagAsController</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ro&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="JointController"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.JointController">[docs]</a><span class="k">class</span> <span class="nc">JointController</span><span class="p">(</span><span class="n">Dag</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;is a joint node with curve shape&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve_param</span><span class="p">:</span> <span class="n">Cp</span><span class="p">):</span>
+        <span class="n">xform</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">createNode</span><span class="p">(</span><span class="s2">&quot;joint&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="s2">&quot;jointControl&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">JointController</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">xform</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">curve_param</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_curve</span><span class="p">(</span><span class="n">curve_param</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;drawStyle&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">DrawStyle</span><span class="o">.</span><span class="n">none</span>
+
+        <span class="k">for</span> <span class="n">lockedattr</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;radi&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">lockedattr</span><span class="p">)</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">lockedattr</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">xform</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">TagAsController</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ro&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Component"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Component">[docs]</a><span class="k">class</span> <span class="nc">Component</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for vertex, control vertex, control point, uv&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compo_name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_list</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_object</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MObject</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_list</span><span class="o">.</span><span class="n">getDagPath</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_object</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn_comp_node</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnSingleIndexedComponent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_object</span><span class="p">)</span>
+
+        <span class="c1"># Gets component type.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_object</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kMeshVertComponent</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_type_str</span> <span class="o">=</span> <span class="s2">&quot;vtx&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_object</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span>
+            <span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kCurveCVComponent</span>
+        <span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_object</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kSurfaceCVComponent</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_type_str</span> <span class="o">=</span> <span class="s2">&quot;cv&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_type_str</span> <span class="o">=</span> <span class="s2">&quot;map&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{o}</span><span class="s2">.</span><span class="si">{t}</span><span class="s2">[</span><span class="si">{i}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">o</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">(),</span>
+            <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comp_type_str</span><span class="p">,</span>
+            <span class="n">i</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fn_comp_node</span><span class="o">.</span><span class="n">element</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">obj_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">world_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the world space coordinates of component&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">xform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@world_pos</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">world_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">xform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">world_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">world_pos</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Component.get_order"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Component.get_order">[docs]</a>    <span class="k">def</span> <span class="nf">get_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">allcompoes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">compo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">compo</span> <span class="ow">in</span> <span class="n">get_all_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m_dag_path</span><span class="o">.</span><span class="n">fullPathName</span><span class="p">())</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">compo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">allcompoes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">compo</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ix</span></div></div>
+
+
+<div class="viewcode-block" id="CurveShape"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.CurveShape">[docs]</a><span class="k">class</span> <span class="nc">CurveShape</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve_shape</span><span class="p">:</span> <span class="n">Dag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">curvefn</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnNurbsCurve</span><span class="p">(</span><span class="n">curve_shape</span><span class="o">.</span><span class="n">m_dag_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">curvefn</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">degree</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curvefn</span><span class="o">.</span><span class="n">degree</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curvefn</span><span class="o">.</span><span class="n">form</span><span class="p">())</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spans</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">curvefn</span><span class="o">.</span><span class="n">numSpans</span><span class="p">())</span>
+
+        <span class="n">knots</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDoubleArray</span><span class="p">()</span>
+        <span class="n">curvefn</span><span class="o">.</span><span class="n">getKnots</span><span class="p">(</span><span class="n">knots</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knots</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">knots</span><span class="p">]</span>
+
+        <span class="n">cvs</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MPointArray</span><span class="p">()</span>
+        <span class="n">curvefn</span><span class="o">.</span><span class="n">getCVs</span><span class="p">(</span><span class="n">cvs</span><span class="p">,</span> <span class="n">om</span><span class="o">.</span><span class="n">MSpace</span><span class="o">.</span><span class="n">kObject</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cvs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">cvs</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">cvs</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">cvs</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cvs</span><span class="o">.</span><span class="n">length</span><span class="p">())</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_knots</span> <span class="o">=</span> <span class="n">curvefn</span><span class="o">.</span><span class="n">numKnots</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CurveShape.rebuild"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.CurveShape.rebuild">[docs]</a>    <span class="k">def</span> <span class="nf">rebuild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="s2">&quot;CurveShape&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.cc&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">degree</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">spans</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">knots</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">num_knots</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="o">.</span><span class="n">cvs</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">values</span> <span class="o">+=</span> <span class="n">shape</span><span class="o">.</span><span class="n">cvs</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;nurbsCurve&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Curve"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Curve">[docs]</a><span class="k">class</span> <span class="nc">Curve</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve</span><span class="p">:</span> <span class="n">Dag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">curve</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shapes</span> <span class="o">=</span> <span class="p">[</span><span class="n">CurveShape</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">curve</span><span class="o">.</span><span class="n">get_all_shapes</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="build_curve"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.build_curve">[docs]</a><span class="k">def</span> <span class="nf">build_curve</span><span class="p">(</span><span class="n">curve</span><span class="p">:</span> <span class="n">Curve</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="n">dag</span> <span class="o">=</span> <span class="n">create</span><span class="p">(</span><span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">curve</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">curve</span><span class="o">.</span><span class="n">shapes</span><span class="p">:</span>
+        <span class="n">shape_name</span> <span class="o">=</span> <span class="n">create</span><span class="p">(</span><span class="s2">&quot;nurbsCurve&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">shape</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">dag</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.cc&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape_name</span><span class="p">),</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">degree</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">spans</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">knots</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">num_knots</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="o">.</span><span class="n">cvs</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">values</span> <span class="o">+=</span> <span class="n">shape</span><span class="o">.</span><span class="n">cvs</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;nurbsCurve&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dag</span></div>
+
+
+<div class="viewcode-block" id="mobject_from_str"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.mobject_from_str">[docs]</a><span class="k">def</span> <span class="nf">mobject_from_str</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">om</span><span class="o">.</span><span class="n">MObject</span><span class="p">:</span>
+    <span class="n">sellist</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+    <span class="n">sellist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="n">mobj</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MObject</span><span class="p">()</span>
+    <span class="n">sellist</span><span class="o">.</span><span class="n">getDependNode</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mobj</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mobj</span></div>
+
+
+<div class="viewcode-block" id="dag_path_from_dag_str"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.dag_path_from_dag_str">[docs]</a><span class="k">def</span> <span class="nf">dag_path_from_dag_str</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">:</span>
+    <span class="n">mobj</span> <span class="o">=</span> <span class="n">mobject_from_str</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mobj</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kDagNode</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">dagpath</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">()</span><span class="o">.</span><span class="n">getAPathTo</span><span class="p">(</span><span class="n">mobj</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dagpath</span></div>
+
+
+<div class="viewcode-block" id="dag_path_and_mobject_from_dag_str"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.dag_path_and_mobject_from_dag_str">[docs]</a><span class="k">def</span> <span class="nf">dag_path_and_mobject_from_dag_str</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">,</span> <span class="n">om</span><span class="o">.</span><span class="n">MObject</span><span class="p">]:</span>
+    <span class="n">sellist</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+    <span class="n">sellist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="n">dagpath</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">()</span>
+    <span class="n">mobj</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MObject</span><span class="p">()</span>
+
+    <span class="n">sellist</span><span class="o">.</span><span class="n">getDagPath</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dagpath</span><span class="p">,</span> <span class="n">mobj</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dagpath</span><span class="p">,</span> <span class="n">mobj</span></div>
+
+
+<div class="viewcode-block" id="is_transform"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.is_transform">[docs]</a><span class="k">def</span> <span class="nf">is_transform</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">mobj</span> <span class="o">=</span> <span class="n">mobject_from_str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mobj</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kTransform</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">mobj</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kMesh</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">mobj</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kNurbsCurve</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">mobj</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kNurbsSurface</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="is_shape"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.is_shape">[docs]</a><span class="k">def</span> <span class="nf">is_shape</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">mobj</span> <span class="o">=</span> <span class="n">mobject_from_str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mobj</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kShape</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="is_attribute"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.is_attribute">[docs]</a><span class="k">def</span> <span class="nf">is_attribute</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">sellist</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+    <span class="n">sellist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">mplug</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MPlug</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sellist</span><span class="o">.</span><span class="n">getPlug</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mplug</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="is_component"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.is_component">[docs]</a><span class="k">def</span> <span class="nf">is_component</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">sellist</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+    <span class="n">sellist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">dagpath</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">()</span>
+    <span class="n">mobj</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MObject</span><span class="p">()</span>
+    <span class="n">sellist</span><span class="o">.</span><span class="n">getDagPath</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dagpath</span><span class="p">,</span> <span class="n">mobj</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mobj</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kComponent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="to_dags"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.to_dags">[docs]</a><span class="k">def</span> <span class="nf">to_dags</span><span class="p">(</span><span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dag</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">Dag</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="to_components"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.to_components">[docs]</a><span class="k">def</span> <span class="nf">to_components</span><span class="p">(</span><span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">Component</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">fl</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span></div>
+
+
+<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dag</span><span class="p">,</span> <span class="n">Node</span><span class="p">]:</span>
+    <span class="n">node</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">createNode</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_transform</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="group"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.group">[docs]</a><span class="k">def</span> <span class="nf">group</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="n">grp</span> <span class="o">=</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+    <span class="n">grp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">grp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">grp</span></div>
+
+
+<div class="viewcode-block" id="cluster"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.cluster">[docs]</a><span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Node</span><span class="p">,</span> <span class="n">Dag</span><span class="p">]:</span>
+    <span class="n">clust</span><span class="p">,</span> <span class="n">clust_handle</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Node</span><span class="p">(</span><span class="n">clust</span><span class="p">),</span> <span class="n">Dag</span><span class="p">(</span><span class="n">clust_handle</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="aimcons"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.aimcons">[docs]</a><span class="k">def</span> <span class="nf">aimcons</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">aimConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="oricons"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.oricons">[docs]</a><span class="k">def</span> <span class="nf">oricons</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="n">cons</span> <span class="o">=</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">orientConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;interpType&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">cons</span></div>
+
+
+<div class="viewcode-block" id="pntcons"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.pntcons">[docs]</a><span class="k">def</span> <span class="nf">pntcons</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">pointConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="parcons"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.parcons">[docs]</a><span class="k">def</span> <span class="nf">parcons</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="n">cons</span> <span class="o">=</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">parentConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;interpType&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">cons</span></div>
+
+
+<div class="viewcode-block" id="scacons"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.scacons">[docs]</a><span class="k">def</span> <span class="nf">scacons</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">scaleConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="pscons"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.pscons">[docs]</a><span class="k">def</span> <span class="nf">pscons</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dag</span><span class="p">,</span> <span class="n">Dag</span><span class="p">]:</span>
+    <span class="n">parcons</span> <span class="o">=</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">parentConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">scacons</span> <span class="o">=</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">scaleConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">parcons</span><span class="p">,</span> <span class="n">scacons</span></div>
+
+
+<div class="viewcode-block" id="get_all_components"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.get_all_components">[docs]</a><span class="k">def</span> <span class="nf">get_all_components</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a list of tokenized component names.&quot;&quot;&quot;</span>
+    <span class="n">sel_list</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MSelectionList</span><span class="p">()</span>
+    <span class="n">sel_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">dag_path</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MDagPath</span><span class="p">()</span>
+    <span class="n">sel_list</span><span class="o">.</span><span class="n">getDagPath</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dag_path</span><span class="p">)</span>
+
+    <span class="n">dag_path</span><span class="o">.</span><span class="n">extendToShape</span><span class="p">()</span>
+
+    <span class="n">compoes</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Mesh</span>
+    <span class="k">if</span> <span class="n">dag_path</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kMesh</span><span class="p">):</span>
+        <span class="n">mesh_fn</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnMesh</span><span class="p">(</span><span class="n">dag_path</span><span class="p">)</span>
+        <span class="n">num_vertices</span> <span class="o">=</span> <span class="n">mesh_fn</span><span class="o">.</span><span class="n">numVertices</span><span class="p">()</span>
+        <span class="n">compoes</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{dp}</span><span class="s2">.vtx[0:</span><span class="si">{vtx}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">dp</span><span class="o">=</span><span class="n">dag_path</span><span class="o">.</span><span class="n">partialPathName</span><span class="p">(),</span> <span class="n">vtx</span><span class="o">=</span><span class="n">num_vertices</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">)</span>
+    <span class="c1"># NURBs Curve</span>
+    <span class="k">elif</span> <span class="n">dag_path</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kNurbsCurve</span><span class="p">):</span>
+        <span class="n">curve_fn</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnNurbsCurve</span><span class="p">(</span><span class="n">dag_path</span><span class="p">)</span>
+        <span class="n">spans</span> <span class="o">=</span> <span class="n">curve_fn</span><span class="o">.</span><span class="n">numSpans</span><span class="p">()</span>
+        <span class="n">degree</span> <span class="o">=</span> <span class="n">curve_fn</span><span class="o">.</span><span class="n">degree</span><span class="p">()</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">curve_fn</span><span class="o">.</span><span class="n">form</span><span class="p">()</span>
+
+        <span class="n">num_cvs</span> <span class="o">=</span> <span class="n">spans</span> <span class="o">+</span> <span class="n">degree</span>
+
+        <span class="k">if</span> <span class="n">form</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">num_cvs</span> <span class="o">-=</span> <span class="n">degree</span>
+
+        <span class="n">compoes</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{dp}</span><span class="s2">.cv[0:</span><span class="si">{cv}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">dp</span><span class="o">=</span><span class="n">dag_path</span><span class="o">.</span><span class="n">partialPathName</span><span class="p">(),</span> <span class="n">cv</span><span class="o">=</span><span class="n">num_cvs</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">)</span>
+    <span class="c1"># NURBs Surface</span>
+    <span class="k">elif</span> <span class="n">dag_path</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kNurbsSurface</span><span class="p">):</span>
+        <span class="n">nurbs_fn</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MFnNurbsSurface</span><span class="p">(</span><span class="n">dag_path</span><span class="p">)</span>
+
+        <span class="n">spans_u</span> <span class="o">=</span> <span class="n">nurbs_fn</span><span class="o">.</span><span class="n">numSpansInU</span><span class="p">()</span>
+        <span class="n">degree_u</span> <span class="o">=</span> <span class="n">nurbs_fn</span><span class="o">.</span><span class="n">degreeU</span><span class="p">()</span>
+
+        <span class="n">spans_v</span> <span class="o">=</span> <span class="n">nurbs_fn</span><span class="o">.</span><span class="n">numSpansInV</span><span class="p">()</span>
+        <span class="n">degree_v</span> <span class="o">=</span> <span class="n">nurbs_fn</span><span class="o">.</span><span class="n">degreeV</span><span class="p">()</span>
+
+        <span class="n">form_u</span> <span class="o">=</span> <span class="n">nurbs_fn</span><span class="o">.</span><span class="n">formInU</span><span class="p">()</span>
+        <span class="n">form_v</span> <span class="o">=</span> <span class="n">nurbs_fn</span><span class="o">.</span><span class="n">formInV</span><span class="p">()</span>
+
+        <span class="n">num_u</span> <span class="o">=</span> <span class="n">spans_u</span> <span class="o">+</span> <span class="n">degree_u</span>
+
+        <span class="k">if</span> <span class="n">form_u</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">num_u</span> <span class="o">-=</span> <span class="n">degree_u</span>
+
+        <span class="n">num_v</span> <span class="o">=</span> <span class="n">spans_v</span> <span class="o">+</span> <span class="n">degree_v</span>
+
+        <span class="k">if</span> <span class="n">form_v</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">num_v</span> <span class="o">-=</span> <span class="n">degree_v</span>
+
+        <span class="n">compoes</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{dp}</span><span class="s2">.cv[0:</span><span class="si">{u}</span><span class="s2">][0:</span><span class="si">{v}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">dp</span><span class="o">=</span><span class="n">dag_path</span><span class="o">.</span><span class="n">partialPathName</span><span class="p">(),</span> <span class="n">u</span><span class="o">=</span><span class="n">num_u</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">num_v</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">)</span>
+    <span class="c1"># Lattice</span>
+    <span class="k">elif</span> <span class="n">dag_path</span><span class="o">.</span><span class="n">hasFn</span><span class="p">(</span><span class="n">om</span><span class="o">.</span><span class="n">MFn</span><span class="o">.</span><span class="n">kLattice</span><span class="p">):</span>
+        <span class="n">latname</span> <span class="o">=</span> <span class="n">dag_path</span><span class="o">.</span><span class="n">partialPathName</span><span class="p">()</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.sDivisions&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">latname</span><span class="p">))</span>
+        <span class="n">nt</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.tDivisions&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">latname</span><span class="p">))</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.uDivisions&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">latname</span><span class="p">))</span>
+        <span class="n">compoes</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{dp}</span><span class="s2">.pt[0:</span><span class="si">{ns}</span><span class="s2">][0:</span><span class="si">{nt}</span><span class="s2">][0:</span><span class="si">{nu}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">dp</span><span class="o">=</span><span class="n">latname</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="n">ns</span><span class="p">,</span> <span class="n">nt</span><span class="o">=</span><span class="n">nt</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="n">nu</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">compoes</span><span class="p">,</span> <span class="n">fl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_compo_index"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.get_compo_index">[docs]</a><span class="k">def</span> <span class="nf">get_compo_index</span><span class="p">(</span><span class="n">compo_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns an ordered component index.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">compo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">get_all_components</span><span class="p">(</span><span class="n">compo_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="k">if</span> <span class="n">compo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">compo_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">ix</span></div>
+
+
+<div class="viewcode-block" id="point_constraint"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.point_constraint">[docs]</a><span class="k">def</span> <span class="nf">point_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">pointConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="parent_constraint"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.parent_constraint">[docs]</a><span class="k">def</span> <span class="nf">parent_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="n">cons</span> <span class="o">=</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">parentConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;interpType&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">cons</span></div>
+
+
+<div class="viewcode-block" id="scale_constraint"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.scale_constraint">[docs]</a><span class="k">def</span> <span class="nf">scale_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">scaleConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ps_constraint"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.ps_constraint">[docs]</a><span class="k">def</span> <span class="nf">ps_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dag</span><span class="p">,</span> <span class="n">Dag</span><span class="p">]:</span>
+    <span class="n">parcons</span> <span class="o">=</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">parentConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">scacons</span> <span class="o">=</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">scaleConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">parcons</span><span class="p">,</span> <span class="n">scacons</span></div>
+
+
+<div class="viewcode-block" id="aim_constraint"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.aim_constraint">[docs]</a><span class="k">def</span> <span class="nf">aim_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">aimConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
