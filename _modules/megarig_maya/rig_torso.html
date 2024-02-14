@@ -44,7 +44,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../megarig_maya.html">megarig_maya package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
 </ul>
 
         </div>
@@ -72,7 +72,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for megarig_maya.rig_torso</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span> <span class="nn">imp</span> <span class="kn">import</span> <span class="n">reload</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
 <span class="kn">import</span> <span class="nn">maya.OpenMaya</span> <span class="k">as</span> <span class="nn">om</span>
@@ -80,31 +81,136 @@
 <span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">core</span> <span class="k">as</span> <span class="n">mrc</span>
 <span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_base</span>
 <span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">mru</span>
-<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_main_group</span>
 <span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_motion_path_spline_ik</span>
+
+<span class="n">reload</span><span class="p">(</span><span class="n">mrc</span><span class="p">)</span>
+<span class="n">reload</span><span class="p">(</span><span class="n">rig_motion_path_spline_ik</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ScapRig"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_torso.ScapRig">[docs]</a><span class="k">class</span> <span class="nc">ScapRig</span><span class="p">(</span><span class="n">rig_base</span><span class="o">.</span><span class="n">BaseRig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mod_desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="p">,</span>
+        <span class="n">color</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="p">,</span>
+        <span class="n">guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">skin_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ScapRig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;scap&quot;</span><span class="p">,</span> <span class="n">mod_desc</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">guide</span><span class="p">)</span>
+
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ofst</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_controller</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">rotate_shape</span><span class="p">((</span><span class="mi">90</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guide</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="s2">&quot;jnt&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">skin_parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">skin_parent</span><span class="p">)</span>
+
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">,</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes_to_set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">],</span> <span class="n">mrc</span><span class="o">.</span><span class="n">SKIN_SET</span><span class="p">)</span>
+
+        <span class="c1"># RO</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">zxy</span></div>
+
+
+<div class="viewcode-block" id="ClavicleRig"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_torso.ClavicleRig">[docs]</a><span class="k">class</span> <span class="nc">ClavicleRig</span><span class="p">(</span><span class="n">rig_base</span><span class="o">.</span><span class="n">BaseRig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mod_desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="p">,</span>
+        <span class="n">color</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="p">,</span>
+        <span class="n">guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tip_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">skin_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ClavicleRig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;clav&quot;</span><span class="p">,</span> <span class="n">mod_desc</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">tip_guide</span><span class="p">)</span>
+
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ofst</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_controller</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">double_stick</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">rotate_shape</span><span class="p">((</span><span class="mi">90</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guide</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="s2">&quot;jnt&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guide</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;tip&quot;</span><span class="p">,),</span> <span class="s2">&quot;jnt&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">snap_point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tip_guide</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">skin_parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">skin_parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">)</span>
+
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">,</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes_to_set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="p">],</span> <span class="n">mrc</span><span class="o">.</span><span class="n">SKIN_SET</span><span class="p">)</span>
+
+        <span class="c1"># RO</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">yzx</span></div>
 
 
 <div class="viewcode-block" id="TorsoRig"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_torso.TorsoRig">[docs]</a><span class="k">class</span> <span class="nc">TorsoRig</span><span class="p">(</span><span class="n">rig_base</span><span class="o">.</span><span class="n">BaseRig</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mod_desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">hip_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">pelvis_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">mid_spine_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">chest_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">chest_tip_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">l_clav_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">l_clav_tip_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">l_scap_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">r_clav_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">r_clav_tip_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">r_scap_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
         <span class="n">skin_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
-        <span class="n">main_grp</span><span class="p">:</span> <span class="n">rig_main_group</span><span class="o">.</span><span class="n">MainGroup</span><span class="p">,</span>
+        <span class="n">still_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TorsoRig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;torso&quot;</span><span class="p">,</span> <span class="n">mod_desc</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="o">.</span><span class="n">none</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">hip_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">hip_guide</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">pelvis_guide</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mid_spine_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">mid_spine_guide</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chest_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">chest_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chest_tip_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">chest_tip_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_clav_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">l_clav_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_clav_tip_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">l_clav_tip_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_scap_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">l_scap_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_clav_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">r_clav_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_clav_tip_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">r_clav_tip_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_scap_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">r_scap_guide</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_locpos</span> <span class="o">=</span> <span class="n">mru</span><span class="o">.</span><span class="n">mvec_to_tuple</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_guide</span><span class="o">.</span><span class="n">world_vec</span> <span class="o">-</span> <span class="n">skin_parent</span><span class="o">.</span><span class="n">world_vec</span>
@@ -120,8 +226,8 @@
             <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;still&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="n">main_grp</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">main_grp</span><span class="o">.</span><span class="n">still_grp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">still_parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">still_parent</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">spine_len</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">(</span>
             <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_guide</span><span class="o">.</span><span class="n">world_pos</span><span class="p">)</span>
@@ -149,7 +255,6 @@
                 <span class="n">col</span><span class="p">,</span>
                 <span class="p">[</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">],</span>
             <span class="p">)</span>
-            <span class="n">ctrl</span><span class="o">.</span><span class="n">rotate_order</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">xzy</span>
             <span class="n">zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">guide</span><span class="p">)</span>
             <span class="n">zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
 
@@ -165,8 +270,7 @@
             <span class="n">locjnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">add_cons</span><span class="p">:</span>
-                <span class="n">cons</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">parent_constraint</span><span class="p">(</span><span class="n">ctrl</span><span class="p">,</span> <span class="n">rigjnt</span><span class="p">)</span>
-                <span class="n">cons</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">)</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="n">ctrl</span><span class="p">,</span> <span class="n">rigjnt</span><span class="p">)</span>
 
             <span class="n">rigjnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">locjnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
             <span class="n">rigjnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">locjnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
@@ -188,8 +292,7 @@
             <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">yellow</span><span class="p">,</span>
             <span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">pelv_pntcons</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">pntcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_rj</span><span class="p">)</span>
-        <span class="n">pelv_pntcons</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">pntcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_rj</span><span class="p">)</span>
 
         <span class="n">pelv_spfoll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
             <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;spineFollow&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span>
@@ -203,10 +306,6 @@
         <span class="n">pelv_spfoll</span> <span class="o">&gt;&gt;</span> <span class="n">pelv_oricons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w1&quot;</span><span class="p">)</span>
         <span class="n">pelv_spfoll</span> <span class="o">&gt;&gt;</span> <span class="n">pelv_spfoll_rev</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ix&quot;</span><span class="p">)</span>
         <span class="n">pelv_spfoll_rev</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ox&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">pelv_oricons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w0&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">hip_grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;hip&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hip_grp</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hip_guide</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hip_grp</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl</span><span class="p">)</span>
 
         <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spine_1_ctrl</span><span class="p">,</span>
@@ -255,9 +354,17 @@
             <span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
             <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">yellow</span><span class="p">,</span>
-            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spine_2_ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl_ori</span><span class="p">,</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;breathe&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_rj</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breathe&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl</span><span class="p">,</span>
@@ -412,7 +519,6 @@
         <span class="k">def</span> <span class="nf">_add_auto_length</span><span class="p">(</span>
             <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
             <span class="n">ctrl</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
-            <span class="n">ctrl_ori</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
             <span class="n">ctrl_zr</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
             <span class="n">tar_zr</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
             <span class="n">tar_ofst</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
@@ -490,7 +596,6 @@
         <span class="n">_add_auto_length</span><span class="p">(</span>
             <span class="s2">&quot;chest&quot;</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl_ori</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl_zr</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl_zr</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl_ofst</span><span class="p">,</span>
@@ -498,7 +603,6 @@
         <span class="n">_add_auto_length</span><span class="p">(</span>
             <span class="s2">&quot;pelv&quot;</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl_ori</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl_zr</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl_zr</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl_ofst</span><span class="p">,</span>
@@ -520,6 +624,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spline</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spline</span><span class="o">.</span><span class="n">master_jnt</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spline</span><span class="o">.</span><span class="n">still_grp</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spline</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># Skin Jnts</span>
         <span class="k">def</span> <span class="nf">_add_skin_jnt</span><span class="p">(</span>
@@ -529,16 +634,14 @@
                 <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,),</span> <span class="s2">&quot;jnt&quot;</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">add_cons</span><span class="p">:</span>
-                <span class="n">cons</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">parent_constraint</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">jnt</span><span class="p">)</span>
-                <span class="n">cons</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">)</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">jnt</span><span class="p">)</span>
             <span class="n">jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_skin_joints_to</span><span class="p">((</span><span class="n">jnt</span><span class="p">,),</span> <span class="n">mrc</span><span class="o">.</span><span class="n">SKIN_SET</span><span class="p">,</span> <span class="n">main_grp</span><span class="o">.</span><span class="n">jnt_vis</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes_to_set</span><span class="p">((</span><span class="n">jnt</span><span class="p">,),</span> <span class="n">mrc</span><span class="o">.</span><span class="n">SKIN_SET</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">jnt</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">hip_jnt</span> <span class="o">=</span> <span class="n">_add_skin_jnt</span><span class="p">(</span><span class="s2">&quot;hip&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hip_grp</span><span class="p">,</span> <span class="n">skin_parent</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_jnt</span> <span class="o">=</span> <span class="n">_add_skin_jnt</span><span class="p">(</span>
-            <span class="s2">&quot;pelvis&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_rj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hip_jnt</span><span class="p">,</span> <span class="kc">True</span>
+            <span class="s2">&quot;pelvis&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_rj</span><span class="p">,</span> <span class="n">skin_parent</span><span class="p">,</span> <span class="kc">True</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spine_1_jnt</span> <span class="o">=</span> <span class="n">_add_skin_jnt</span><span class="p">(</span>
             <span class="s2">&quot;spine_1&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spline</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_jnt</span><span class="p">,</span> <span class="kc">True</span>
@@ -559,11 +662,177 @@
             <span class="s2">&quot;spine_6&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spline</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_5_jnt</span><span class="p">,</span> <span class="kc">True</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chest_jnt</span> <span class="o">=</span> <span class="n">_add_skin_jnt</span><span class="p">(</span>
-            <span class="s2">&quot;chest&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_6_jnt</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="s2">&quot;chest&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_guide</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_6_jnt</span><span class="p">,</span> <span class="kc">False</span>
         <span class="p">)</span>
 
-        <span class="n">chest_oricons</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">oricons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_jnt</span><span class="p">)</span>
-        <span class="n">chest_oricons</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">)</span></div>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">oricons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_jnt</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_jnt</span> <span class="o">=</span> <span class="n">_add_skin_jnt</span><span class="p">(</span>
+            <span class="s2">&quot;breathe&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_guide</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_jnt</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_jnt</span><span class="o">.</span><span class="n">ssc</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chest_tip_jnt</span> <span class="o">=</span> <span class="n">_add_skin_jnt</span><span class="p">(</span>
+            <span class="s2">&quot;chest_tip&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_guide</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">breathe_jnt</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chest_tip_jnt</span><span class="o">.</span><span class="n">snap_point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_tip_guide</span><span class="p">)</span>
+
+        <span class="c1"># Clavicles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_clav_rig</span> <span class="o">=</span> <span class="n">ClavicleRig</span><span class="p">(</span>
+            <span class="n">mod_desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="o">.</span><span class="n">left</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">red</span><span class="p">,</span>
+            <span class="n">guide</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l_clav_guide</span><span class="p">,</span>
+            <span class="n">tip_guide</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l_clav_tip_guide</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="p">,</span>
+            <span class="n">skin_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_jnt</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_clav_rig</span> <span class="o">=</span> <span class="n">ClavicleRig</span><span class="p">(</span>
+            <span class="n">mod_desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="o">.</span><span class="n">right</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">blue</span><span class="p">,</span>
+            <span class="n">guide</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">r_clav_guide</span><span class="p">,</span>
+            <span class="n">tip_guide</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">r_clav_tip_guide</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="p">,</span>
+            <span class="n">skin_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_jnt</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Scapulae</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_scap_rig</span> <span class="o">=</span> <span class="n">ScapRig</span><span class="p">(</span>
+            <span class="n">mod_desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="o">.</span><span class="n">left</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">red</span><span class="p">,</span>
+            <span class="n">guide</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l_scap_guide</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="p">,</span>
+            <span class="n">skin_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_jnt</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l_clav_rig</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_scap_rig</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="p">,</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_scap_rig</span> <span class="o">=</span> <span class="n">ScapRig</span><span class="p">(</span>
+            <span class="n">mod_desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="o">.</span><span class="n">right</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">blue</span><span class="p">,</span>
+            <span class="n">guide</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">r_scap_guide</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="p">,</span>
+            <span class="n">skin_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chest_jnt</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_clav_rig</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_scap_rig</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="p">,</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Breathe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_chest_ty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breatheChestTy&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mf">0.0016</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_len</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_chest_rx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breatheChestRx&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=-</span><span class="mf">0.2</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_sx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breatheSx&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mf">0.0032</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_len</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breatheSz&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mf">0.0016</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_len</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_breathe_clav_tz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;lftBreatheClavTz&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mf">0.0016</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_len</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_breathe_clav_tz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;rgtBreatheClavTz&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mf">0.0016</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_len</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_spine_2_sc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breatheSp2Sc&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=-</span><span class="mf">0.004</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_spine_3_sc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breatheSp3Sc&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=-</span><span class="mf">0.004</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">breathe_spine_4_sc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breatheSp4Sc&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=-</span><span class="mf">0.004</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_add_breathe_tr_amper</span><span class="p">(</span>
+            <span class="n">amp_attr</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">:</span>
+            <span class="n">mult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mru</span><span class="o">.</span><span class="n">attr_amper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">names</span><span class="p">,</span>
+                <span class="s2">&quot;mult&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">amp_attr</span> <span class="o">&gt;&gt;</span> <span class="n">mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">mult</span>
+
+        <span class="k">def</span> <span class="nf">_add_breathe_sc_amper</span><span class="p">(</span>
+            <span class="n">amp_attr</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">,</span> <span class="n">targets</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">],</span> <span class="n">names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">:</span>
+            <span class="n">mult</span> <span class="o">=</span> <span class="n">_add_breathe_tr_amper</span><span class="p">(</span><span class="n">amp_attr</span><span class="p">,</span> <span class="n">targets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">names</span><span class="p">)</span>
+            <span class="n">add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mru</span><span class="o">.</span><span class="n">attr_adder</span><span class="p">(</span><span class="n">mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">),</span> <span class="n">targets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">names</span><span class="p">,</span>
+                <span class="s2">&quot;add&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                    <span class="n">add</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">target</span>
+
+            <span class="k">return</span> <span class="n">add</span>
+
+        <span class="n">_add_breathe_tr_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_chest_ty</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ty&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;chest&quot;</span><span class="p">,</span> <span class="s2">&quot;ty&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">_add_breathe_tr_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_chest_rx</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_grp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;chest&quot;</span><span class="p">,</span> <span class="s2">&quot;rx&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">_add_breathe_sc_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_sx</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">),),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;sc&quot;</span><span class="p">,</span> <span class="s2">&quot;sx&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">_add_breathe_sc_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_sz</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">breathe_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">),),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;sc&quot;</span><span class="p">,</span> <span class="s2">&quot;sz&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">_add_breathe_tr_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">l_breathe_clav_tz</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">l_clav_rig</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;tz&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="s2">&quot;clav&quot;</span><span class="p">,</span> <span class="s2">&quot;tz&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">_add_breathe_tr_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">r_breathe_clav_tz</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">r_clav_rig</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;tz&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;clav&quot;</span><span class="p">,</span> <span class="s2">&quot;tz&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">_add_breathe_sc_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_spine_2_sc</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spine_2_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_2_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;sp&quot;</span><span class="p">,</span> <span class="s2">&quot;sc&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">_add_breathe_sc_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_spine_3_sc</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spine_3_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_3_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;sp&quot;</span><span class="p">,</span> <span class="s2">&quot;sc&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">_add_breathe_sc_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">breathe_spine_4_sc</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spine_4_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">spine_4_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s2">&quot;breath&quot;</span><span class="p">,</span> <span class="s2">&quot;sp&quot;</span><span class="p">,</span> <span class="s2">&quot;sc&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># RO</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pelvis_ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">zxy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spine_1_ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">zxy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spine_2_ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">zxy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chest_ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">zxy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">zxy</span></div>
 </pre></div>
 
            </div>

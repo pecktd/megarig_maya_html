@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>megarig_maya.rig_volpres &mdash; megarig_maya  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            megarig_maya
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">megarig_maya</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">megarig_maya.rig_volpres</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for megarig_maya.rig_volpres</h1><div class="highlight"><pre>
+<span></span><span class="c1"># System Modules</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="c1"># pkrig Modules</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">core</span> <span class="k">as</span> <span class="n">mrc</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">mru</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_base</span>
+
+
+<div class="viewcode-block" id="VolRig"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_volpres.VolRig">[docs]</a><span class="k">class</span> <span class="nc">VolRig</span><span class="p">(</span><span class="n">rig_base</span><span class="o">.</span><span class="n">BaseRig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mod_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="p">,</span>
+        <span class="n">joint_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VolRig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_ofst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,),</span> <span class="s2">&quot;ofst&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_ofst</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,),</span> <span class="s2">&quot;sdk&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_sdk</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,),</span> <span class="s2">&quot;zr&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Joint</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="n">joint_type</span><span class="p">)</span>
+
+        <span class="c1"># Sum Nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;plusMinusAverage&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,),</span> <span class="s2">&quot;sum&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o3&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_sdk</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;plusMinusAverage&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,),</span> <span class="s2">&quot;sum&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o3&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_sdk</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Offset Locator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Locator</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,),</span> <span class="s2">&quot;loc&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc</span><span class="o">.</span><span class="n">lhattrs</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_zr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;localScale&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">offset</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i3[0]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i3[0]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_sum</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Input Attr</span>
+        <span class="n">mru</span><span class="o">.</span><span class="n">add_divide_attr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_loc_shape</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_nx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;negX&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_px</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;posX&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_ny</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;negY&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_py</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;posY&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_nz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;negZ&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_pz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_loc_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;posZ&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Modifiers</span>
+        <span class="k">def</span> <span class="nf">_add_modifier</span><span class="p">(</span><span class="n">driver</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">,</span> <span class="nb">dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="p">):</span>
+
+            <span class="n">pn</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">pnax</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pn</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
+
+            <span class="n">loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Locator</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="n">pnax</span><span class="p">,),</span> <span class="s2">&quot;loc&quot;</span><span class="p">)</span>
+            <span class="n">loc</span><span class="o">.</span><span class="n">lhattrs</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
+            <span class="n">loc</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_loc</span><span class="p">)</span>
+            <span class="n">loc</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+
+            <span class="n">locshape</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+            <span class="n">locshape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;localScale&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">offset</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">3</span>
+
+            <span class="n">locshape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;lp</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">))</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">*</span> <span class="mf">0.1</span>
+            <span class="k">if</span> <span class="n">pn</span> <span class="o">==</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span>
+                <span class="n">locshape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;lp</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">))</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="n">offset</span> <span class="o">*</span> <span class="mf">0.1</span>
+
+            <span class="n">minattr</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;rotMin&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">maxattr</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;rotMax&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">in_nx</span> <span class="o">=</span> <span class="n">locshape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;negX&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">in_px</span> <span class="o">=</span> <span class="n">locshape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;posX&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">in_ny</span> <span class="o">=</span> <span class="n">locshape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;negY&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">in_py</span> <span class="o">=</span> <span class="n">locshape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;posY&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">in_nz</span> <span class="o">=</span> <span class="n">locshape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;negZ&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">in_pz</span> <span class="o">=</span> <span class="n">locshape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;posZ&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_nx</span> <span class="o">&gt;&gt;</span> <span class="n">in_nx</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_px</span> <span class="o">&gt;&gt;</span> <span class="n">in_px</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_ny</span> <span class="o">&gt;&gt;</span> <span class="n">in_ny</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_py</span> <span class="o">&gt;&gt;</span> <span class="n">in_py</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_nz</span> <span class="o">&gt;&gt;</span> <span class="n">in_nz</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_pz</span> <span class="o">&gt;&gt;</span> <span class="n">in_pz</span>
+
+            <span class="n">t_mult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;multiplyDivide&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">pnax</span><span class="p">),</span> <span class="s2">&quot;mult&quot;</span>
+            <span class="p">)</span>
+            <span class="n">loc</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">t_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
+
+            <span class="n">r_mult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;multiplyDivide&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">pnax</span><span class="p">),</span> <span class="s2">&quot;mult&quot;</span>
+            <span class="p">)</span>
+            <span class="n">loc</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">r_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
+
+            <span class="n">rem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;remapValue&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="n">pnax</span><span class="p">,),</span> <span class="s2">&quot;remap&quot;</span>
+            <span class="p">)</span>
+            <span class="n">minattr</span> <span class="o">&gt;&gt;</span> <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;inputMin&quot;</span><span class="p">)</span>
+            <span class="n">maxattr</span> <span class="o">&gt;&gt;</span> <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;inputMax&quot;</span><span class="p">)</span>
+            <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outValue&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">t_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2x&quot;</span><span class="p">)</span>
+            <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outValue&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">t_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2y&quot;</span><span class="p">)</span>
+            <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outValue&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">t_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2z&quot;</span><span class="p">)</span>
+            <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outValue&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">r_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2x&quot;</span><span class="p">)</span>
+            <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outValue&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">r_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2y&quot;</span><span class="p">)</span>
+            <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outValue&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">r_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2z&quot;</span><span class="p">)</span>
+
+            <span class="n">t_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i3[</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_sum</span><span class="p">))</span>
+            <span class="n">r_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i3[</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_sum</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_sum</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">driver</span> <span class="o">&gt;&gt;</span> <span class="n">rem</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;inputValue&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">loc</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">px_loc</span> <span class="o">=</span> <span class="n">_add_modifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_px</span><span class="p">,</span> <span class="s2">&quot;posX&quot;</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nx_loc</span> <span class="o">=</span> <span class="n">_add_modifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_nx</span><span class="p">,</span> <span class="s2">&quot;negX&quot;</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">dark_red</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">py_loc</span> <span class="o">=</span> <span class="n">_add_modifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_py</span><span class="p">,</span> <span class="s2">&quot;posY&quot;</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ny_loc</span> <span class="o">=</span> <span class="n">_add_modifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_ny</span><span class="p">,</span> <span class="s2">&quot;negY&quot;</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">dark_green</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pz_loc</span> <span class="o">=</span> <span class="n">_add_modifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_pz</span><span class="p">,</span> <span class="s2">&quot;posZ&quot;</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">blue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nz_loc</span> <span class="o">=</span> <span class="n">_add_modifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_nz</span><span class="p">,</span> <span class="s2">&quot;negZ&quot;</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">dark_blue</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="VolPresRig"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_volpres.VolPresRig">[docs]</a><span class="k">class</span> <span class="nc">VolPresRig</span><span class="p">(</span><span class="n">rig_base</span><span class="o">.</span><span class="n">BaseRig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">target_pos</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">volume_joints</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span>
+        <span class="n">mod_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="p">,</span>
+        <span class="n">joint_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A volume preservation rigging module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target (mrc.Dag): A joint that volume preservation rig will be</span>
+<span class="sd">                attached at and will be parented under target&#39;s parent.</span>
+<span class="sd">            ctrl_parent (mrc.Dag):</span>
+<span class="sd">            offset (float): Default offset value for volume joints.</span>
+<span class="sd">            volume_joints (tuple): A tuple of 6 boolean values</span>
+<span class="sd">                if all True values are given, the volume joints on all 6 axes</span>
+<span class="sd">                are created.</span>
+<span class="sd">                The order of the axes is</span>
+<span class="sd">                (pos_x, neg_x, pos_y, neg_y, pos_z, neg_z)</span>
+<span class="sd">            mod (str):</span>
+<span class="sd">            desc (str):</span>
+<span class="sd">            side (mrc.Side/None):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Main Groups</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VolPresRig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">pntcons</span><span class="p">(</span><span class="n">target_pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_ofst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;rot&quot;</span><span class="p">,</span> <span class="s2">&quot;ofst&quot;</span><span class="p">),</span> <span class="s2">&quot;grp&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_ofst</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_ofst</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;rot&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_ofst</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span> <span class="o">==</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rot_ofst</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">180</span>
+
+        <span class="n">rot_oricon</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">oricons</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">,</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_blend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;pairBlend&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;rot&quot;</span><span class="p">,),</span> <span class="s2">&quot;blend&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;currentDriver&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rotInterpolation&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">rot_oricon</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;cr&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;inRotate2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outRotateX&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outRotateY&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ry&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outRotateZ&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rz&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="s2">&quot;jnt&quot;</span>
+        <span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">jnts</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">]</span>
+
+        <span class="c1"># Extract rotations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_e2q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;eulerToQuat&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;rot&quot;</span><span class="p">,),</span> <span class="s2">&quot;e2q&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_e2q</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;inputRotate&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ro&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_e2q</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;inputRotateOrder&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_connect_q2e</span><span class="p">(</span><span class="n">ax</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Uses quatToEuler node to extract specific axis rotate value.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                ax (str): &quot;X&quot;, &quot;Y&quot; ,&quot;Z&quot;</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">q2e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;quatToEuler&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">lower</span><span class="p">()),</span> <span class="s2">&quot;q2e&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ro&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">q2e</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;inputRotateOrder&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rot_e2q</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outputQuat</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">))</span> <span class="o">&gt;&gt;</span> <span class="n">q2e</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span>
+                <span class="s2">&quot;inputQuat</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rot_e2q</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outputQuatW&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">q2e</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;inputQuatW&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">q2e</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;outputRotate</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_x</span> <span class="o">=</span> <span class="n">_connect_q2e</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_y</span> <span class="o">=</span> <span class="n">_connect_q2e</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_z</span> <span class="o">=</span> <span class="n">_connect_q2e</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_sep_rot_values</span><span class="p">(</span>
+            <span class="n">driver</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">]:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Uses clamp node to separate positive and negative values to</span>
+<span class="sd">            two attributes.</span>
+<span class="sd">            The negative value will be inverted to positive.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                ax (str): &#39;X&#39;, &#39;Y&#39;, or &#39;Z&#39;</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">clamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mru</span><span class="o">.</span><span class="n">add_two_ways_clamp</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;r</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">),</span> <span class="s2">&quot;pn&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;clamp&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;multDoubleLinear&quot;</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;r</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">),</span> <span class="s2">&quot;n&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;inv&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;opg&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">inv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
+            <span class="n">inv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;opr&quot;</span><span class="p">),</span> <span class="n">inv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_px</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_nx</span> <span class="o">=</span> <span class="n">_sep_rot_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_x</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_py</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_ny</span> <span class="o">=</span> <span class="n">_sep_rot_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_y</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_pz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_nz</span> <span class="o">=</span> <span class="n">_sep_rot_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_z</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Volume Joints</span>
+        <span class="k">def</span> <span class="nf">_create_volume_rig</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">mult</span><span class="p">):</span>
+            <span class="n">pn</span> <span class="o">=</span> <span class="s2">&quot;p&quot;</span>
+            <span class="k">if</span> <span class="n">mult</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">pn</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span>
+            <span class="n">volrig</span> <span class="o">=</span> <span class="n">VolRig</span><span class="p">(</span>
+                <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pn</span><span class="p">,</span> <span class="n">ax</span><span class="p">),</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
+                <span class="n">joint_type</span><span class="o">=</span><span class="n">joint_type</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Position</span>
+            <span class="n">volrig</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">)</span>
+            <span class="n">volrig</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">)</span>
+
+            <span class="n">volrig</span><span class="o">.</span><span class="n">pos_loc</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ax</span><span class="p">))</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">*</span> <span class="n">mult</span>
+            <span class="n">volrig</span><span class="o">.</span><span class="n">jnt</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">volrig</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+            <span class="n">volrig</span><span class="o">.</span><span class="n">jnt</span><span class="o">.</span><span class="n">freeze</span><span class="p">()</span>
+            <span class="n">volrig</span><span class="o">.</span><span class="n">jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">)</span>
+
+            <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="n">volrig</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">volrig</span><span class="o">.</span><span class="n">jnt</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_px</span> <span class="o">&gt;&gt;</span> <span class="n">volrig</span><span class="o">.</span><span class="n">in_px</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_nx</span> <span class="o">&gt;&gt;</span> <span class="n">volrig</span><span class="o">.</span><span class="n">in_nx</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_py</span> <span class="o">&gt;&gt;</span> <span class="n">volrig</span><span class="o">.</span><span class="n">in_py</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_ny</span> <span class="o">&gt;&gt;</span> <span class="n">volrig</span><span class="o">.</span><span class="n">in_ny</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_pz</span> <span class="o">&gt;&gt;</span> <span class="n">volrig</span><span class="o">.</span><span class="n">in_pz</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_nz</span> <span class="o">&gt;&gt;</span> <span class="n">volrig</span><span class="o">.</span><span class="n">in_nz</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">jnts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">volrig</span><span class="o">.</span><span class="n">jnt</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">volrig</span>
+
+        <span class="k">if</span> <span class="n">volume_joints</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">px_rig</span> <span class="o">=</span> <span class="n">_create_volume_rig</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">volume_joints</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nx_rig</span> <span class="o">=</span> <span class="n">_create_volume_rig</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">volume_joints</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">py_rig</span> <span class="o">=</span> <span class="n">_create_volume_rig</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">volume_joints</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ny_rig</span> <span class="o">=</span> <span class="n">_create_volume_rig</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">volume_joints</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pz_rig</span> <span class="o">=</span> <span class="n">_create_volume_rig</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">volume_joints</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nz_rig</span> <span class="o">=</span> <span class="n">_create_volume_rig</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

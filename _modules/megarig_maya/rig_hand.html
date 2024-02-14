@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>megarig_maya.rig_hand &mdash; megarig_maya  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            megarig_maya
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">megarig_maya</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">megarig_maya.rig_hand</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for megarig_maya.rig_hand</h1><div class="highlight"><pre>
+<span></span><span class="c1"># System Modules</span>
+<span class="kn">from</span> <span class="nn">imp</span> <span class="kn">import</span> <span class="n">reload</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+
+
+<span class="c1"># pkrig modules</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">core</span> <span class="k">as</span> <span class="n">mrc</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">mru</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">naming_tools</span> <span class="k">as</span> <span class="n">mrnt</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_base</span> <span class="k">as</span> <span class="n">mrb</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_fk</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_volpres</span>
+
+<span class="n">reload</span><span class="p">(</span><span class="n">rig_fk</span><span class="p">)</span>
+<span class="n">reload</span><span class="p">(</span><span class="n">rig_volpres</span><span class="p">)</span>
+<span class="n">reload</span><span class="p">(</span><span class="n">mrnt</span><span class="p">)</span>
+
+<span class="n">FINGER_SDK</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;thumb&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;FistRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx3&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;SpreadRz2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;FlexRx2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;BreakRz2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;BaseSpreadRz1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;BaseBreakRz1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;BaseFlexRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;FistRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.8</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.3</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.4</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx2&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">18</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;SpreadRz2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;BreakRz2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;BaseSpreadRz1&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;middle&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;FistRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.7</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.95</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.1</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx2&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">18</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;SpreadRz2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;BreakRz2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;BaseSpreadRz1&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;ring&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;FistRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx2&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">18</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;SpreadRz2&quot;</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;BreakRz2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;BaseSpreadRz1&quot;</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;pinky&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;FistRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;FistRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;CupRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx2&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">18</span><span class="p">,</span>
+        <span class="s2">&quot;ScrunchRx4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+        <span class="s2">&quot;SpreadRz2&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;BreakRz2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;BaseSpreadRz1&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="set_default_finger_multipliers"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_hand.set_default_finger_multipliers">[docs]</a><span class="k">def</span> <span class="nf">set_default_finger_multipliers</span><span class="p">(</span><span class="n">ctrl</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span> <span class="n">finger</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets default values to finger multipliers regarding to FINGER_SDK.&quot;&quot;&quot;</span>
+    <span class="n">value_dict</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">FINGER_SDK</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">finger</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="n">value_dict</span> <span class="o">=</span> <span class="n">FINGER_SDK</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">value_dict</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">value_dict</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">value_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">attrname</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{f}{a}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">finger</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">attrname</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="n">ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">attrname</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">value_dict</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="FingerRig"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_hand.FingerRig">[docs]</a><span class="k">class</span> <span class="nc">FingerRig</span><span class="p">(</span><span class="n">rig_fk</span><span class="o">.</span><span class="n">LimbFkRig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">guides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">hand_ctrl</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">finger</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">skin_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">vol_pres</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FingerRig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">guides</span><span class="o">=</span><span class="n">guides</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">side</span><span class="o">=</span><span class="n">side</span><span class="p">,</span>
+            <span class="n">mod_name</span><span class="o">=</span><span class="n">finger</span><span class="p">,</span>
+            <span class="n">mod_desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">joint_type</span><span class="o">=</span><span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+            <span class="n">ctrl_shape</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Color</span><span class="o">.</span><span class="n">none</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span>
+            <span class="n">spaces_attrnames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Hand Ctrl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span> <span class="o">=</span> <span class="n">hand_ctrl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vol_pres_vis_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;volPresVis&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Tip Joint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">guides</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tip_guide</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;tip&quot;</span><span class="p">,),</span> <span class="s2">&quot;jnt&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">skin_parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">skin_parent</span><span class="p">)</span>
+
+        <span class="c1"># Color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrls</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dark_color</span>
+        <span class="k">for</span> <span class="n">ctrl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrls</span><span class="p">[</span><span class="mi">2</span><span class="p">:]:</span>
+            <span class="n">ctrl</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">soft_color</span>
+
+        <span class="c1"># Stretch Attr</span>
+        <span class="n">str_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;stretch&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">str_dv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ty&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_str_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">attr_amper</span><span class="p">(</span><span class="n">str_attr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ty&quot;</span><span class="p">),</span> <span class="mf">0.1</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;tip&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;amp&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_str_adder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">attr_adder</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tip_str_amper</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ty&quot;</span><span class="p">),</span> <span class="n">str_dv</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;tip&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;add&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Volume Preservation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vol_pres_rigs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">rig_volpres</span><span class="o">.</span><span class="n">VolPresRig</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">vol_pres</span><span class="p">:</span>
+            <span class="n">volpres_ofst</span> <span class="o">=</span> <span class="n">mru</span><span class="o">.</span><span class="n">get_length</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnts</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="p">])</span> <span class="o">*</span> <span class="mf">0.05</span>
+            <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">jnt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="n">modname</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="n">finger</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;volpres&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">n</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">volpres</span> <span class="o">=</span> <span class="n">rig_volpres</span><span class="o">.</span><span class="n">VolPresRig</span><span class="p">(</span>
+                    <span class="n">target</span><span class="o">=</span><span class="n">jnt</span><span class="p">,</span>
+                    <span class="n">target_pos</span><span class="o">=</span><span class="n">jnt</span><span class="p">,</span>
+                    <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                    <span class="n">offset</span><span class="o">=</span><span class="n">volpres_ofst</span><span class="p">,</span>
+                    <span class="n">volume_joints</span><span class="o">=</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                    <span class="n">mod_name</span><span class="o">=</span><span class="n">modname</span><span class="p">,</span>
+                    <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                    <span class="n">joint_type</span><span class="o">=</span><span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vol_pres_vis_attr</span> <span class="o">&gt;&gt;</span> <span class="n">volpres</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vol_pres_rigs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">volpres</span><span class="p">)</span>
+
+        <span class="c1"># Rotation Sum Nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sdk_rx_sums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sdk_ry_sums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sdk_rz_sums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnts</span><span class="p">)):</span>
+            <span class="n">idstr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">rx_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;plusMinusAverage&quot;</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span> <span class="s2">&quot;sdk&quot;</span><span class="p">,</span> <span class="n">idstr</span><span class="p">),</span>
+                <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">ry_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;plusMinusAverage&quot;</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;ry&quot;</span><span class="p">,</span> <span class="s2">&quot;sdk&quot;</span><span class="p">,</span> <span class="n">idstr</span><span class="p">),</span>
+                <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">rz_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;plusMinusAverage&quot;</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;rz&quot;</span><span class="p">,</span> <span class="s2">&quot;sdk&quot;</span><span class="p">,</span> <span class="n">idstr</span><span class="p">),</span>
+                <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">sdk_rx_sums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rx_sum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sdk_ry_sums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ry_sum</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sdk_rz_sums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rz_sum</span><span class="p">)</span>
+
+            <span class="n">rx_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o1&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ories</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">)</span>
+            <span class="n">ry_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o1&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ories</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ry&quot;</span><span class="p">)</span>
+            <span class="n">rz_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o1&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ories</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rz&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Hand SDKs</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;__hand__&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">add_divide_attr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="p">,</span> <span class="s2">&quot;hand&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - fist</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;fist&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;fist&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fist_rx_ampers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fist_ry_ampers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fist_rz_ampers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnts</span><span class="p">)):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">rx_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+                <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;fist&quot;</span><span class="p">,</span>
+                <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rx_sums</span><span class="p">[</span><span class="n">ix</span><span class="p">],</span>
+                <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">ry_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+                <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;fist&quot;</span><span class="p">,</span>
+                <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;ry&quot;</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_ry_sums</span><span class="p">[</span><span class="n">ix</span><span class="p">],</span>
+                <span class="n">dv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">rz_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+                <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;fist&quot;</span><span class="p">,</span>
+                <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rz&quot;</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rz_sums</span><span class="p">[</span><span class="n">ix</span><span class="p">],</span>
+                <span class="n">dv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fist_rx_ampers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rx_amper</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fist_ry_ampers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ry_amper</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fist_rz_ampers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rz_amper</span><span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - scrunch</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;scrunch&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;scrunch&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scrunch_rx_ampers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnts</span><span class="p">)):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">rx_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+                <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;scrunch&quot;</span><span class="p">,</span>
+                <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rx_sums</span><span class="p">[</span><span class="n">ix</span><span class="p">],</span>
+                <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scrunch_rx_ampers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rx_amper</span><span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - cup</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;cup&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;cup&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cup_rx_ampers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnts</span><span class="p">)):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">rx_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+                <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;cup&quot;</span><span class="p">,</span>
+                <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rx_sums</span><span class="p">[</span><span class="n">ix</span><span class="p">],</span>
+                <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cup_rx_ampers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rx_amper</span><span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - spread</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;spread&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;spread&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spread_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+            <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;spread&quot;</span><span class="p">,</span>
+            <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rz&quot;</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+            <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rz_sums</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;break&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;break&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">break_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+            <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;break&quot;</span><span class="p">,</span>
+            <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rz&quot;</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+            <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rz_sums</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - flex</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;flex&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;flex&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">flex_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+            <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;flex&quot;</span><span class="p">,</span>
+            <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+            <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rx_sums</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - baseSpread</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;baseSpread&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;baseSpread&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_spread_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+            <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;baseSpread&quot;</span><span class="p">,</span>
+            <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rz&quot;</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+            <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rz_sums</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - baseBreak</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;baseBreak&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;baseBreak&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_break_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+            <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;baseBreak&quot;</span><span class="p">,</span>
+            <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rz&quot;</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+            <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rz_sums</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Hand SDKs - baseFlex</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;baseFlex&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;baseFlex&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_flex_amper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hand_sdk</span><span class="p">(</span>
+            <span class="n">sdk_name</span><span class="o">=</span><span class="s2">&quot;baseFlex&quot;</span><span class="p">,</span>
+            <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+            <span class="n">sum_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_rx_sums</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">dv</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">set_default_finger_multipliers</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">(),</span>
+            <span class="s2">&quot;</span><span class="si">{f}{d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mod_desc</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Skin Joints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes_to_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnts</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="p">],</span> <span class="n">mrc</span><span class="o">.</span><span class="n">SKIN_SET</span><span class="p">)</span>
+
+        <span class="c1"># RO</span>
+        <span class="n">ctrl</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span>
+        <span class="k">for</span> <span class="n">ctrl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrls</span><span class="p">:</span>
+            <span class="n">ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">yzx</span>
+
+    <span class="k">def</span> <span class="nf">_hand_sdk</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sdk_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">attr_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">index</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">sum_node</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">,</span>
+        <span class="n">dv</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Node</span><span class="p">:</span>
+        <span class="n">amp_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="n">ln</span><span class="o">=</span><span class="n">mrnt</span><span class="o">.</span><span class="n">lower_camelize</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mod_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_desc</span><span class="p">,</span> <span class="n">sdk_name</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">index</span><span class="p">]</span>
+            <span class="p">),</span>
+            <span class="n">dv</span><span class="o">=</span><span class="n">dv</span><span class="p">,</span>
+            <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">conns</span> <span class="o">=</span> <span class="n">sum_node</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">connections</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">last_input</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">conns</span><span class="p">:</span>
+            <span class="n">last_input</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">conns</span><span class="p">)</span>
+
+        <span class="n">amper</span> <span class="o">=</span> <span class="n">mru</span><span class="o">.</span><span class="n">attr_amper</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hand_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">sdk_name</span><span class="p">),</span>
+            <span class="n">sum_node</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1[</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">last_input</span><span class="p">)),</span>
+            <span class="n">dv</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">amp_attr</span> <span class="o">&gt;&gt;</span> <span class="n">amper</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">amper</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="n">sdk_name</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">index</span><span class="p">),</span> <span class="s2">&quot;mult&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HumanHand"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_hand.HumanHand">[docs]</a><span class="k">class</span> <span class="nc">HumanHand</span><span class="p">(</span><span class="n">mrb</span><span class="o">.</span><span class="n">BaseRig</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">thumb_guides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">index_guides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">middle_guides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">ring_guides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">pinky_guides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">mod_desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">skin_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">vol_pres</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HumanHand</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;hand&quot;</span><span class="p">,</span> <span class="n">mod_desc</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent_at</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="c1"># Main Controllers</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ofst</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_controller</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">stick</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="o">.</span><span class="n">set_parent_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">vol_pres</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vol_pres_vis_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;volPresVis&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumb</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ring</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pinky</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">thumb_guides</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thumb</span> <span class="o">=</span> <span class="n">FingerRig</span><span class="p">(</span>
+                <span class="n">guides</span><span class="o">=</span><span class="n">thumb_guides</span><span class="p">,</span>
+                <span class="n">hand_ctrl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+                <span class="n">finger</span><span class="o">=</span><span class="s2">&quot;thumb&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                <span class="n">skin_parent</span><span class="o">=</span><span class="n">skin_parent</span><span class="p">,</span>
+                <span class="n">vol_pres</span><span class="o">=</span><span class="n">vol_pres</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">index_guides</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">FingerRig</span><span class="p">(</span>
+                <span class="n">guides</span><span class="o">=</span><span class="n">index_guides</span><span class="p">,</span>
+                <span class="n">hand_ctrl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+                <span class="n">finger</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                <span class="n">skin_parent</span><span class="o">=</span><span class="n">skin_parent</span><span class="p">,</span>
+                <span class="n">vol_pres</span><span class="o">=</span><span class="n">vol_pres</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">middle_guides</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">middle</span> <span class="o">=</span> <span class="n">FingerRig</span><span class="p">(</span>
+                <span class="n">guides</span><span class="o">=</span><span class="n">middle_guides</span><span class="p">,</span>
+                <span class="n">hand_ctrl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+                <span class="n">finger</span><span class="o">=</span><span class="s2">&quot;middle&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                <span class="n">skin_parent</span><span class="o">=</span><span class="n">skin_parent</span><span class="p">,</span>
+                <span class="n">vol_pres</span><span class="o">=</span><span class="n">vol_pres</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">ring_guides</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ring</span> <span class="o">=</span> <span class="n">FingerRig</span><span class="p">(</span>
+                <span class="n">guides</span><span class="o">=</span><span class="n">ring_guides</span><span class="p">,</span>
+                <span class="n">hand_ctrl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+                <span class="n">finger</span><span class="o">=</span><span class="s2">&quot;ring&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                <span class="n">skin_parent</span><span class="o">=</span><span class="n">skin_parent</span><span class="p">,</span>
+                <span class="n">vol_pres</span><span class="o">=</span><span class="n">vol_pres</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">pinky_guides</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pinky</span> <span class="o">=</span> <span class="n">FingerRig</span><span class="p">(</span>
+                <span class="n">guides</span><span class="o">=</span><span class="n">pinky_guides</span><span class="p">,</span>
+                <span class="n">hand_ctrl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+                <span class="n">finger</span><span class="o">=</span><span class="s2">&quot;pinky&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                <span class="n">skin_parent</span><span class="o">=</span><span class="n">skin_parent</span><span class="p">,</span>
+                <span class="n">vol_pres</span><span class="o">=</span><span class="n">vol_pres</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Finger Constraints</span>
+        <span class="n">fingers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">FingerRig</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">finger</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thumb</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">middle</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ring</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pinky</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">finger</span><span class="p">:</span>
+                <span class="n">fingers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">finger</span><span class="p">)</span>
+
+        <span class="n">mid_cons</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="p">,</span> <span class="n">fingers</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">ctrl_zrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fingers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">second_last_cons</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="p">,</span> <span class="n">fingers</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">ctrl_zrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="n">fingers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ctrl_zrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">mid_cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.33333</span>
+            <span class="n">mid_cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.66667</span>
+
+            <span class="n">second_last_cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.66667</span>
+            <span class="n">second_last_cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.33333</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">fingers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">last_cons</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="p">,</span> <span class="n">fingers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ctrl_zrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mo</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">mid_cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.2</span>
+            <span class="n">mid_cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+            <span class="n">last_cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.5</span>
+            <span class="n">last_cons</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;w1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.5</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

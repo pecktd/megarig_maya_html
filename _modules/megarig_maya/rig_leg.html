@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>megarig_maya.rig_leg &mdash; megarig_maya  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            megarig_maya
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">megarig_maya</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">megarig_maya.rig_leg</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for megarig_maya.rig_leg</h1><div class="highlight"><pre>
+<span></span><span class="c1"># System Modules</span>
+<span class="kn">from</span> <span class="nn">imp</span> <span class="kn">import</span> <span class="n">reload</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="c1"># Maya modules</span>
+<span class="kn">import</span> <span class="nn">maya.OpenMaya</span> <span class="k">as</span> <span class="nn">om</span>
+
+<span class="c1"># megarig modules</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">core</span> <span class="k">as</span> <span class="n">mrc</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">mru</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_base</span>
+
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_fk</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_stretchy_ik</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_ribbon_ik</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_volpres</span>
+
+<span class="n">reload</span><span class="p">(</span><span class="n">rig_stretchy_ik</span><span class="p">)</span>
+<span class="n">reload</span><span class="p">(</span><span class="n">rig_ribbon_ik</span><span class="p">)</span>
+<span class="n">reload</span><span class="p">(</span><span class="n">rig_fk</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LegRig"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_leg.LegRig">[docs]</a><span class="k">class</span> <span class="nc">LegRig</span><span class="p">(</span><span class="n">rig_base</span><span class="o">.</span><span class="n">BaseRig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">upper_leg_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">knee_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ankle_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ball_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">toe_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">inner_foot_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">outer_foot_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">heel_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">mod_desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">skin_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">still_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">fk_spaces_attrnames</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="n">ik_spaces_attrnames</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="n">vol_pres</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LegRig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;leg&quot;</span><span class="p">,</span> <span class="n">mod_desc</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent_at</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">upper_leg_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knee_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">knee_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">ankle_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">ball_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">toe_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">inner_foot_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">outer_foot_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">heel_guide</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_len</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">MVector</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_guide</span><span class="o">.</span><span class="n">world_vec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_guide</span><span class="o">.</span><span class="n">world_vec</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_guide</span><span class="o">.</span><span class="n">world_vec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">knee_guide</span><span class="o">.</span><span class="n">world_vec</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">length</span><span class="p">()</span>
+
+        <span class="c1"># Main Groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;sc&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;still&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">still_parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">still_parent</span><span class="p">)</span>
+
+        <span class="c1"># Main Joints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_guide</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;up&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_guide</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;knee&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_guide</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ankle&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ball&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_guide</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;toe&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_jnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_jnt</span><span class="o">.</span><span class="n">ssc</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="o">.</span><span class="n">ssc</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">skin_parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">skin_parent</span><span class="p">)</span>
+
+        <span class="c1"># Proxy Joints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_pxj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;up&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;pxJnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knee_pxj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;knee&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;pxJnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ankle&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;pxJnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_pxj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_jnt</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ball&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;pxJnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_pxj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_jnt</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;toe&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;pxJnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_pxj_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">add_zero_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_pxj</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;up&quot;</span><span class="p">,</span> <span class="s2">&quot;pxJnt&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;zr&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_pxj</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_pxj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_pxj</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_pxj</span><span class="o">.</span><span class="n">ssc</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_pxj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knee_pxj</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_pxj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_pxj_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_nrj</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_non_roll_joint</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_pxj</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;up&quot;</span><span class="p">,)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_nrj</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_non_roll_joint</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ankle&quot;</span><span class="p">,)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_roll_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_nrj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;twist&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_nrj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;twist&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span> <span class="o">==</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">_add_inverse_roll</span><span class="p">(</span><span class="n">attr</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Attr</span><span class="p">:</span>
+                <span class="n">mult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+                    <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;multDoubleLinear&quot;</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;tw&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;inv&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">attr</span> <span class="o">&gt;&gt;</span> <span class="n">mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
+                <span class="n">mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+                <span class="k">return</span> <span class="n">mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_roll_attr</span> <span class="o">=</span> <span class="n">_add_inverse_roll</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_nrj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;twist&quot;</span><span class="p">),</span> <span class="s2">&quot;up&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_attr</span> <span class="o">=</span> <span class="n">_add_inverse_roll</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ankle_nrj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;twist&quot;</span><span class="p">),</span> <span class="s2">&quot;ankle&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Main Controller</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl_ofst</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl_ori</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl_zr</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_controller</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">stick</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;ro&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl</span><span class="o">.</span><span class="n">rotate_shape</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_sc_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;legScale&quot;</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;footScale&quot;</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)</span>
+
+        <span class="n">fkik_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;fkIk&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fkik_rev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;reverse&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;ik&quot;</span><span class="p">),</span> <span class="s2">&quot;rev&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># FK</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fk</span> <span class="o">=</span> <span class="n">rig_fk</span><span class="o">.</span><span class="n">LimbFkRig</span><span class="p">(</span>
+            <span class="n">guides</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_guide</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">knee_guide</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_guide</span><span class="p">),</span>
+            <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;leg_fk&quot;</span><span class="p">,</span>
+            <span class="n">mod_desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">joint_type</span><span class="o">=</span><span class="s2">&quot;fkJnt&quot;</span><span class="p">,</span>
+            <span class="n">ctrl_shape</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">double_circle</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="p">,</span>
+            <span class="n">spaces_attrnames</span><span class="o">=</span><span class="n">fk_spaces_attrnames</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">ctrls</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lhattrs</span><span class="p">(</span><span class="s2">&quot;ry&quot;</span><span class="p">,</span> <span class="s2">&quot;rz&quot;</span><span class="p">,</span> <span class="s2">&quot;ro&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_fk_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;fkJnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_fk_jnt</span><span class="o">.</span><span class="n">ssc</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_fk_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_guide</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;fkJnt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_fk_jnt</span><span class="p">)</span>
+
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_ctrl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_ctrl_ofst</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_ctrl_ori</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_ctrl_zr</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_controller</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">),</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">double_circle</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_ctrl_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_ctrl_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">ctrls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">oricons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_fk_jnt</span><span class="p">)</span>
+
+        <span class="n">fk_toe_str_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;stretch&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fk_toe_str_add</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk_toe_str_amp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_attr_adder_amper</span><span class="p">(</span>
+            <span class="n">fk_toe_str_attr</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ty&quot;</span><span class="p">),</span>
+            <span class="mf">0.1</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># IK</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik</span> <span class="o">=</span> <span class="n">rig_stretchy_ik</span><span class="o">.</span><span class="n">StretchyIk</span><span class="p">(</span>
+            <span class="n">guides</span><span class="o">=</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_guide</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">knee_guide</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ankle_guide</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">toe_guide</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">ee_index</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">pole_vector_offset</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">actual_length</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">spaces_attrnames</span><span class="o">=</span><span class="n">ik_spaces_attrnames</span><span class="p">,</span>
+            <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;leg_ik&quot;</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">ctrl_shape</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span>
+            <span class="n">ctrl_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+            <span class="n">joint_type</span><span class="o">=</span><span class="s2">&quot;ikJnt&quot;</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_ikh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">ikrp</span><span class="p">(</span><span class="n">sj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ee</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ball&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;ikh&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_ikh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">ikrp</span><span class="p">(</span><span class="n">sj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">ee</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;toe&quot;</span><span class="p">,),</span>
+            <span class="s2">&quot;ikh&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Foot Roll Pivots</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;ankle&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;ankle&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span> <span class="s2">&quot;grp&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;bend&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;foot&quot;</span><span class="p">,</span> <span class="s2">&quot;in&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;foot&quot;</span><span class="p">,</span> <span class="s2">&quot;out&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_foot_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;foot&quot;</span><span class="p">,</span> <span class="s2">&quot;mid&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;heel&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;foot&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_piv_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_piv</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;ankle&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">,</span> <span class="s2">&quot;piv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;zr&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_grp</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;ankle&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;zr&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;bend&quot;</span><span class="p">,</span> <span class="s2">&quot;piv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;zr&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;foot&quot;</span><span class="p">,</span> <span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="s2">&quot;piv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;zr&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;foot&quot;</span><span class="p">,</span> <span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="s2">&quot;piv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;zr&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_foot_piv_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_foot_piv</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;foot&quot;</span><span class="p">,</span> <span class="s2">&quot;mid&quot;</span><span class="p">,</span> <span class="s2">&quot;piv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;zr&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_piv_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heel_piv</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;heel&quot;</span><span class="p">,</span> <span class="s2">&quot;piv&quot;</span><span class="p">),</span> <span class="s2">&quot;zr&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_piv_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_piv</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;piv&quot;</span><span class="p">),</span> <span class="s2">&quot;zr&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_piv_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foot_piv</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;foot&quot;</span><span class="p">,</span> <span class="s2">&quot;piv&quot;</span><span class="p">),</span> <span class="s2">&quot;zr&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_ik_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;leg&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_ik_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;ball&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_ik_piv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;tip&quot;</span><span class="p">),</span> <span class="s2">&quot;piv&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_piv_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_piv_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_foot_piv_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_piv_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heel_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_piv_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_guide</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_ik_piv</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_ik_piv</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_ik_piv</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_guide</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_piv_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heel_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_piv_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_piv_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_foot_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_foot_piv_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foot_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_piv_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">leg_ik_piv</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_grp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_ik_piv</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_grp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_ik_piv</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ikh_pos_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leg_ik_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_ikh</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_ik_piv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_ikh</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_ik_piv</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_ik_piv</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># IK - Toe Stretch</span>
+        <span class="n">ik_toe_str_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;toeStretch&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_str_add</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_str_amp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_attr_adder_amper</span><span class="p">(</span>
+            <span class="n">ik_toe_str_attr</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toe_ik_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ty&quot;</span><span class="p">),</span>
+            <span class="mf">0.1</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_str_add</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ty&quot;</span><span class="p">)</span>
+
+        <span class="c1"># IK - Toe Controller</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_ctrl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Controller</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">double_circle</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;ctrl&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_ctrl</span><span class="o">.</span><span class="n">lhattrs</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_ctrl</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_ctrl_zr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_ctrl</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;ctrl&quot;</span><span class="p">),</span> <span class="s2">&quot;zr&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_ctrl_zr</span><span class="o">.</span><span class="n">set_parent_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv_zr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_bend_piv</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_ctrl</span><span class="p">)</span>
+
+        <span class="c1"># IK - Roll Attributes</span>
+        <span class="k">def</span> <span class="nf">_add_roll_attrs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">xtgs</span><span class="p">,</span> <span class="n">ytgs</span><span class="p">,</span> <span class="n">ztgs</span><span class="p">):</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">add_divide_attr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">tgs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">((</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">xtgs</span><span class="p">,</span> <span class="n">ytgs</span><span class="p">,</span> <span class="n">ztgs</span><span class="p">)):</span>
+                <span class="n">footattr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                    <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">attr</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">tg</span> <span class="ow">in</span> <span class="n">tgs</span><span class="p">:</span>
+                    <span class="n">footattr</span> <span class="o">&gt;&gt;</span> <span class="n">tg</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;xrye&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;xryl&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;mrye&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;mryl&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># IK - FootRoll</span>
+        <span class="n">ik_ctrl_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span>
+        <span class="n">ik_ctrl_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;toeRollMin&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=-</span><span class="mi">180</span><span class="p">)</span>
+        <span class="n">ik_ctrl_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;heelRollMin&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">ik_ctrl_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;heelRollMax&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+        <span class="n">ik_ctrl_shape</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;ballRollMax&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_roll_clamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;clamp&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;ball&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span> <span class="s2">&quot;clamp&quot;</span>
+        <span class="p">)</span>
+        <span class="n">ik_ctrl_shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ballRollMax&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;mxr&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;opr&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">)</span>
+
+        <span class="n">_add_roll_attrs</span><span class="p">(</span>
+            <span class="s2">&quot;foot&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ipr&quot;</span><span class="p">),),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ry&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">outer_foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ry&quot;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middle_foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rz&quot;</span><span class="p">),),</span>
+        <span class="p">)</span>
+
+        <span class="n">breakattr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;breakAngle&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dv</span><span class="o">=-</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">breakattr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;mnr&quot;</span><span class="p">)</span>
+
+        <span class="c1"># IK - Heel Roll</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_clamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;clamp&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;heel&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span> <span class="s2">&quot;clamp&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;plusMinusAverage&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;heel&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;footX&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ipr&quot;</span><span class="p">)</span>
+        <span class="n">ik_ctrl_shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;heelRollMin&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;mnr&quot;</span><span class="p">)</span>
+        <span class="n">ik_ctrl_shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;heelRollMax&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;mxr&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;opr&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1[0]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o1&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">heel_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">)</span>
+
+        <span class="n">_add_roll_attrs</span><span class="p">(</span>
+            <span class="s2">&quot;heel&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heel_roll_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1[1]&quot;</span><span class="p">),),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heel_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ry&quot;</span><span class="p">),),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heel_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rz&quot;</span><span class="p">),),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># IK rig - Toe Roll</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_clamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;clamp&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span> <span class="s2">&quot;clamp&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;plusMinusAverage&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;multiplyDivide&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">,</span> <span class="s2">&quot;roll&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;inv&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_inv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2x&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;footX&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ipr&quot;</span><span class="p">)</span>
+        <span class="n">breakattr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;mxr&quot;</span><span class="p">)</span>
+        <span class="n">ik_ctrl_shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;toeRollMin&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;mnr&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_clamp</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;opr&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1[0]&quot;</span><span class="p">)</span>
+        <span class="n">breakattr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_inv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1x&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_inv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ox&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1[1]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o1&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">)</span>
+
+        <span class="n">_add_roll_attrs</span><span class="p">(</span>
+            <span class="s2">&quot;toe&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_roll_sum</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1[2]&quot;</span><span class="p">),),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ry&quot;</span><span class="p">),),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;rz&quot;</span><span class="p">),),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># FK/IK Blend</span>
+        <span class="n">fkik_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fkik_rev</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ix&quot;</span><span class="p">)</span>
+        <span class="n">fkik_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fkik_rev</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ox&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">tr_blend</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_pxj</span><span class="p">,</span>
+                <span class="n">fkik_attr</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">,</span> <span class="s2">&quot;leg&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">tr_blend</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">knee_pxj</span><span class="p">,</span>
+                <span class="n">fkik_attr</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;knee&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">tr_blend</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="p">,</span>
+                <span class="n">fkik_attr</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;ankle&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">tr_blend</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ball_fk_jnt</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ball_pxj</span><span class="p">,</span>
+                <span class="n">fkik_attr</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;ball&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">tr_blend</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">toe_fk_jnt</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">toe_pxj</span><span class="p">,</span>
+                <span class="n">fkik_attr</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">&quot;fk&quot;</span><span class="p">,</span> <span class="s2">&quot;ik&quot;</span><span class="p">,</span> <span class="s2">&quot;toe&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_nrj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_pxj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_pxj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_jnt</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toe_pxj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_jnt</span><span class="p">)</span>
+
+        <span class="c1"># Foot scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">ctrl_ories</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">ctrl_ories</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">ctrl_ories</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">foot_piv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foot_sc_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_pxj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Ribbon IK</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl_ofst</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl_ori</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl_zr</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_controller</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;mid&quot;</span><span class="p">,),</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">plus</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;ro&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">parcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl_zr</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_ribik</span> <span class="o">=</span> <span class="n">rig_ribbon_ik</span><span class="o">.</span><span class="n">RibbonIk</span><span class="p">(</span>
+            <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl</span><span class="p">,</span>
+            <span class="n">root_tg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_nrj</span><span class="p">,</span>
+            <span class="n">end_tg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl</span><span class="p">,</span>
+            <span class="n">parent_tg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_nrj</span><span class="p">,</span>
+            <span class="n">jnt_amt</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;ik_up_leg&quot;</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">ctrl_shp</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">double_circle</span><span class="p">,</span>
+            <span class="n">dtl_ctrl_shp</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">none</span><span class="p">,</span>
+            <span class="n">ctrl_clr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dark_color</span><span class="p">,</span>
+            <span class="n">dtl_clr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="p">,</span>
+            <span class="n">skin_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="p">,</span>
+            <span class="n">still_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_roll_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_ribik</span><span class="o">.</span><span class="n">end_twist</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lower_leg_ribik</span> <span class="o">=</span> <span class="n">rig_ribbon_ik</span><span class="o">.</span><span class="n">RibbonIk</span><span class="p">(</span>
+            <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="p">,</span>
+            <span class="n">root_tg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl</span><span class="p">,</span>
+            <span class="n">end_tg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_nrj</span><span class="p">,</span>
+            <span class="n">parent_tg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_pxj</span><span class="p">,</span>
+            <span class="n">jnt_amt</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;ik_low_leg&quot;</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">ctrl_shp</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">double_circle</span><span class="p">,</span>
+            <span class="n">dtl_ctrl_shp</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">none</span><span class="p">,</span>
+            <span class="n">ctrl_clr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dark_color</span><span class="p">,</span>
+            <span class="n">dtl_clr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_grp</span><span class="p">,</span>
+            <span class="n">skin_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="p">,</span>
+            <span class="n">still_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ankle_roll_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_leg_ribik</span><span class="o">.</span><span class="n">end_twist</span>
+
+        <span class="c1"># Cleanup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_pxj</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_nrj</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">jnts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;fkIk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;parentTo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes_to_set</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_ribik</span><span class="o">.</span><span class="n">ribbon</span><span class="o">.</span><span class="n">jnts</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower_leg_ribik</span><span class="o">.</span><span class="n">ribbon</span><span class="o">.</span><span class="n">jnts</span>
+            <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_jnt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toe_jnt</span><span class="p">],</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">SKIN_SET</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add volume preservation</span>
+        <span class="n">volpres_ofst</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">leg_len</span>
+        <span class="k">if</span> <span class="n">vol_pres</span><span class="p">:</span>
+            <span class="n">visattr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_ctrl</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">ln</span><span class="o">=</span><span class="s2">&quot;volPresVis&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_volpres</span> <span class="o">=</span> <span class="n">rig_volpres</span><span class="o">.</span><span class="n">VolPresRig</span><span class="p">(</span>
+                <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="p">,</span>
+                <span class="n">target_pos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_jnt</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                <span class="n">offset</span><span class="o">=</span><span class="n">volpres_ofst</span><span class="p">,</span>
+                <span class="n">volume_joints</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;upper_leg_volpres&quot;</span><span class="p">,</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">joint_type</span><span class="o">=</span><span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">knee_volpres</span> <span class="o">=</span> <span class="n">rig_volpres</span><span class="o">.</span><span class="n">VolPresRig</span><span class="p">(</span>
+                <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">knee_jnt</span><span class="p">,</span>
+                <span class="n">target_pos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mid_ctrl</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                <span class="n">offset</span><span class="o">=</span><span class="n">volpres_ofst</span><span class="p">,</span>
+                <span class="n">volume_joints</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;knee_volpres&quot;</span><span class="p">,</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">joint_type</span><span class="o">=</span><span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ankle_volpres</span> <span class="o">=</span> <span class="n">rig_volpres</span><span class="o">.</span><span class="n">VolPresRig</span><span class="p">(</span>
+                <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="p">,</span>
+                <span class="n">target_pos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ankle_jnt</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+                <span class="n">offset</span><span class="o">=</span><span class="n">volpres_ofst</span><span class="p">,</span>
+                <span class="n">volume_joints</span><span class="o">=</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;ankle_volpres&quot;</span><span class="p">,</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">joint_type</span><span class="o">=</span><span class="s2">&quot;jnt&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">visattr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_volpres</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">)</span>
+            <span class="n">visattr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">knee_volpres</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">)</span>
+            <span class="n">visattr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_volpres</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes_to_set</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">upper_leg_volpres</span><span class="o">.</span><span class="n">jnts</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">knee_volpres</span><span class="o">.</span><span class="n">jnts</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ankle_volpres</span><span class="o">.</span><span class="n">jnts</span><span class="p">,</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">SKIN_SET</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># RO</span>
+        <span class="n">ctrl</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span>
+        <span class="k">for</span> <span class="n">ctrl</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">ctrls</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fk</span><span class="o">.</span><span class="n">ctrls</span><span class="p">[</span><span class="mi">2</span><span class="p">]]:</span>
+            <span class="n">ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">yzx</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">xzy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ik_toe_ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">yzx</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

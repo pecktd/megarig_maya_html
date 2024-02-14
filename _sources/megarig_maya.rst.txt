@@ -4,6 +4,14 @@ megarig\_maya package
 Submodules
 ----------
 
+megarig\_maya.cleanup module
+----------------------------
+
+.. automodule:: megarig_maya.cleanup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 megarig\_maya.core module
 -------------------------
 
@@ -36,6 +44,14 @@ megarig\_maya.naming\_tools module
    :undoc-members:
    :show-inheritance:
 
+megarig\_maya.rig\_arm module
+-----------------------------
+
+.. automodule:: megarig_maya.rig_arm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 megarig\_maya.rig\_base module
 ------------------------------
 
@@ -48,6 +64,38 @@ megarig\_maya.rig\_cog module
 -----------------------------
 
 .. automodule:: megarig_maya.rig_cog
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+megarig\_maya.rig\_fk module
+----------------------------
+
+.. automodule:: megarig_maya.rig_fk
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+megarig\_maya.rig\_hand module
+------------------------------
+
+.. automodule:: megarig_maya.rig_hand
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+megarig\_maya.rig\_head module
+------------------------------
+
+.. automodule:: megarig_maya.rig_head
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+megarig\_maya.rig\_leg module
+-----------------------------
+
+.. automodule:: megarig_maya.rig_leg
    :members:
    :undoc-members:
    :show-inheritance:
@@ -68,6 +116,14 @@ megarig\_maya.rig\_motion\_path\_spline\_ik module
    :undoc-members:
    :show-inheritance:
 
+megarig\_maya.rig\_neck module
+------------------------------
+
+.. automodule:: megarig_maya.rig_neck
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 megarig\_maya.rig\_ribbon\_ik module
 ------------------------------------
 
@@ -84,10 +140,26 @@ megarig\_maya.rig\_simple\_muscle module
    :undoc-members:
    :show-inheritance:
 
+megarig\_maya.rig\_stretchy\_ik module
+--------------------------------------
+
+.. automodule:: megarig_maya.rig_stretchy_ik
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 megarig\_maya.rig\_torso module
 -------------------------------
 
 .. automodule:: megarig_maya.rig_torso
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+megarig\_maya.rig\_volpres module
+---------------------------------
+
+.. automodule:: megarig_maya.rig_volpres
    :members:
    :undoc-members:
    :show-inheritance:

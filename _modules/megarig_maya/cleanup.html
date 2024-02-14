@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>megarig_maya.cleanup &mdash; megarig_maya  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            megarig_maya
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">megarig_maya</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">megarig_maya.cleanup</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for megarig_maya.cleanup</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">maya.cmds</span> <span class="k">as</span> <span class="nn">mc</span>
+
+
+<span class="n">DELETE_NODES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;guide_grp&quot;</span><span class="p">,)</span>
+
+
+<div class="viewcode-block" id="import_all_references"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.import_all_references">[docs]</a><span class="k">def</span> <span class="nf">import_all_references</span><span class="p">():</span>
+    <span class="n">refnodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;reference&quot;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">refnodes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">for</span> <span class="n">rfn</span> <span class="ow">in</span> <span class="n">refnodes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rfn</span> <span class="o">==</span> <span class="s2">&quot;sharedReferenceNode&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">referenceQuery</span><span class="p">(</span><span class="n">rfn</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">importReference</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">lockNode</span><span class="p">(</span><span class="n">rfn</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">rfn</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="flatten_all_namespaces"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.flatten_all_namespaces">[docs]</a><span class="k">def</span> <span class="nf">flatten_all_namespaces</span><span class="p">():</span>
+    <span class="n">exceptions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;UI&quot;</span><span class="p">,</span> <span class="s2">&quot;shared&quot;</span><span class="p">]</span>
+    <span class="n">nss</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">namespaceInfo</span><span class="p">(</span><span class="n">lon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">nss</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">exceptions</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">flatten_all_nodes_in_namesapce</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">namespace</span><span class="p">(</span><span class="n">rm</span><span class="o">=</span><span class="n">ns</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="flatten_all_nodes_in_namesapce"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.flatten_all_nodes_in_namesapce">[docs]</a><span class="k">def</span> <span class="nf">flatten_all_nodes_in_namesapce</span><span class="p">(</span><span class="n">ns</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:*&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ns</span><span class="p">),</span> <span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">namespace</span><span class="p">(</span><span class="nb">set</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nodes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">lock_state</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">lockNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lock_state</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">lockNode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">newname</span> <span class="o">=</span> <span class="n">node</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">newname</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">lockNode</span><span class="p">(</span><span class="n">newname</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="n">lock_state</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="remove_unused_influences"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_unused_influences">[docs]</a><span class="k">def</span> <span class="nf">remove_unused_influences</span><span class="p">(</span><span class="n">skinnode</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">infs</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">skinCluster</span><span class="p">(</span><span class="n">skinnode</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inf</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">wtinfs</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">skinCluster</span><span class="p">(</span><span class="n">skinnode</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">wi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">infs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">for</span> <span class="n">inf</span> <span class="ow">in</span> <span class="n">infs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inf</span> <span class="ow">in</span> <span class="n">wtinfs</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">skinCluster</span><span class="p">(</span><span class="n">skinnode</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ri</span><span class="o">=</span><span class="n">inf</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="remove_all_unused_influences"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_all_unused_influences">[docs]</a><span class="k">def</span> <span class="nf">remove_all_unused_influences</span><span class="p">():</span>
+    <span class="n">skins</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;skinCluster&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">skins</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">for</span> <span class="n">skin</span> <span class="ow">in</span> <span class="n">skins</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">referenceQuery</span><span class="p">(</span><span class="n">skin</span><span class="p">,</span> <span class="n">inr</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">remove_unused_influences</span><span class="p">(</span><span class="n">skin</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="remove_all_unused_intermediate_shapes"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_all_unused_intermediate_shapes">[docs]</a><span class="k">def</span> <span class="nf">remove_all_unused_intermediate_shapes</span><span class="p">():</span>
+    <span class="n">removed_meshes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;mesh&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">referenceQuery</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">inr</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.io&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+            <span class="n">removed_meshes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">removed_meshes</span></div>
+
+
+<div class="viewcode-block" id="remove_all_cameras"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_all_cameras">[docs]</a><span class="k">def</span> <span class="nf">remove_all_cameras</span><span class="p">():</span>
+    <span class="n">cams</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;camera&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">cam</span> <span class="ow">in</span> <span class="n">cams</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">referenceQuery</span><span class="p">(</span><span class="n">cam</span><span class="p">,</span> <span class="n">inr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="ow">or</span> <span class="n">mc</span><span class="o">.</span><span class="n">camera</span><span class="p">(</span><span class="n">cam</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sc</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">camxform</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="n">cam</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">camxform</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_all_mesh_xforms"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.get_all_mesh_xforms">[docs]</a><span class="k">def</span> <span class="nf">get_all_mesh_xforms</span><span class="p">():</span>
+    <span class="n">meshes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;mesh&quot;</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">meshxforms</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">meshes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">meshxforms</span>
+
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">meshes</span><span class="p">:</span>
+        <span class="n">pars</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">referenceQuery</span><span class="p">(</span><span class="n">pars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">isNodeReferenced</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">pars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">meshxforms</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">meshxforms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pars</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">meshxforms</span></div>
+
+
+<div class="viewcode-block" id="get_orig_shape"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.get_orig_shape">[docs]</a><span class="k">def</span> <span class="nf">get_orig_shape</span><span class="p">(</span><span class="n">mesh_xform</span><span class="p">):</span>
+    <span class="n">shapes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="n">mesh_xform</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">shapes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">shapes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape</span><span class="p">)):</span>
+            <span class="n">connections</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.inMesh&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">connections</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">shape</span></div>
+
+
+<div class="viewcode-block" id="get_editable_shapes"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.get_editable_shapes">[docs]</a><span class="k">def</span> <span class="nf">get_editable_shapes</span><span class="p">(</span><span class="n">mesh_xform</span><span class="p">):</span>
+    <span class="n">shapes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="n">mesh_xform</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">shapes</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">editable_shapes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.inMesh&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">editable_shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">editable_shapes</span></div>
+
+
+<div class="viewcode-block" id="get_all_editable_shapes"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.get_all_editable_shapes">[docs]</a><span class="k">def</span> <span class="nf">get_all_editable_shapes</span><span class="p">():</span>
+    <span class="n">editable_shapes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;mesh&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.inMesh&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">editable_shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">editable_shapes</span></div>
+
+
+<div class="viewcode-block" id="remove_all_color_sets"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_all_color_sets">[docs]</a><span class="k">def</span> <span class="nf">remove_all_color_sets</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">get_all_editable_shapes</span><span class="p">():</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">color_sets</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">polyColorSet</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allColorSets</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">color_sets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">colorset</span> <span class="ow">in</span> <span class="n">color_sets</span><span class="p">:</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">polyColorSet</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colorSet</span><span class="o">=</span><span class="n">colorset</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="remove_color_sets_from"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_color_sets_from">[docs]</a><span class="k">def</span> <span class="nf">remove_color_sets_from</span><span class="p">(</span><span class="n">mesh_xform</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">get_editable_shapes</span><span class="p">(</span><span class="n">mesh_xform</span><span class="p">):</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">color_sets</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">polyColorSet</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allColorSets</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">color_sets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">colorset</span> <span class="ow">in</span> <span class="n">color_sets</span><span class="p">:</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">polyColorSet</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colorSet</span><span class="o">=</span><span class="n">colorset</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="unlock_all_normals"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.unlock_all_normals">[docs]</a><span class="k">def</span> <span class="nf">unlock_all_normals</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">get_all_editable_shapes</span><span class="p">():</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">mc</span><span class="o">.</span><span class="n">polyNormalPerVertex</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ufn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="soft_all_edges"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.soft_all_edges">[docs]</a><span class="k">def</span> <span class="nf">soft_all_edges</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">get_all_editable_shapes</span><span class="p">():</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">mc</span><span class="o">.</span><span class="n">polyNormalPerVertex</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ufn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">polySoftEdge</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">ch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="clean_all_meshes"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.clean_all_meshes">[docs]</a><span class="k">def</span> <span class="nf">clean_all_meshes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes all color sets, unlock all normals and smooth all edges.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">get_all_editable_shapes</span><span class="p">():</span>
+        <span class="n">intermediate</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">color_sets</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">polyColorSet</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allColorSets</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">color_sets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">colorset</span> <span class="ow">in</span> <span class="n">color_sets</span><span class="p">:</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">polyColorSet</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colorSet</span><span class="o">=</span><span class="n">colorset</span><span class="p">)</span>
+
+        <span class="n">mc</span><span class="o">.</span><span class="n">polyNormalPerVertex</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">ufn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">polySoftEdge</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">ch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">intermediate</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.intermediateObject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="remove_all_unknowns"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_all_unknowns">[docs]</a><span class="k">def</span> <span class="nf">remove_all_unknowns</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursively removes unknown nodes from current scene.&quot;&quot;&quot;</span>
+    <span class="n">unkns</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">unkns</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">for</span> <span class="n">unkn</span> <span class="ow">in</span> <span class="n">unkns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">unkn</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">unkn</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> has been removed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unkn</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+    <span class="n">remove_all_unknowns</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="remove_all_shaders"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_all_shaders">[docs]</a><span class="k">def</span> <span class="nf">remove_all_shaders</span><span class="p">():</span>
+    <span class="n">exceptions</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;initialShadingGroup&quot;</span><span class="p">,</span> <span class="s2">&quot;initialParticleSE&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">se</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;shadingEngine&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">se</span> <span class="ow">in</span> <span class="n">exceptions</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">shaders</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.surfaceShader&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">se</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">shaders</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">shaders</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> has been deleted.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shaders</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> cannot be deleted.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shaders</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">se</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> has been deleted.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">se</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> cannot be deleted.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">se</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;mesh&quot;</span><span class="p">):</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">sets</span><span class="p">(</span><span class="n">e</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">forceElement</span><span class="o">=</span><span class="s2">&quot;initialShadingGroup&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_all_ng_skintools_nodes"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_all_ng_skintools_nodes">[docs]</a><span class="k">def</span> <span class="nf">remove_all_ng_skintools_nodes</span><span class="p">():</span>
+    <span class="n">ngnodes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;ngst2MeshDisplay&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;ngst2SkinLayerData&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ngnodes</span><span class="p">:</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">ngnodes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_all_anim_curves"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.remove_all_anim_curves">[docs]</a><span class="k">def</span> <span class="nf">remove_all_anim_curves</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">anim</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;animCurve&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">anim</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">listConnections</span><span class="p">(</span><span class="n">anim</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">anim</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cleanup_scene"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.cleanup.cleanup_scene">[docs]</a><span class="k">def</span> <span class="nf">cleanup_scene</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">DELETE_NODES</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">chd</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">listRelatives</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;transform&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">chd</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">referenceQuery</span><span class="p">(</span><span class="n">chd</span><span class="p">,</span> <span class="n">inr</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">rn</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">referenceQuery</span><span class="p">(</span><span class="n">chd</span><span class="p">,</span> <span class="n">rfn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">fn</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">referenceQuery</span><span class="p">(</span><span class="n">rn</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">file</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">rr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">import_all_references</span><span class="p">()</span>
+
+    <span class="n">node_types</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="s2">&quot;renderLayer&quot;</span><span class="p">,</span> <span class="s2">&quot;displayLayer&quot;</span><span class="p">)</span>
+    <span class="n">exceptions</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;defaultRenderLayer&quot;</span><span class="p">,</span> <span class="s2">&quot;defaultLayer&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">nodetype</span> <span class="ow">in</span> <span class="n">node_types</span><span class="p">:</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">nodetype</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">exceptions</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> cannot be deleted.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">DELETE_NODES</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="o">.</span><span class="n">objExists</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="n">mc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="n">flatten_all_namespaces</span><span class="p">()</span>
+    <span class="n">remove_all_ng_skintools_nodes</span><span class="p">()</span>
+    <span class="n">remove_all_unused_influences</span><span class="p">()</span>
+    <span class="n">remove_all_unused_intermediate_shapes</span><span class="p">()</span>
+    <span class="n">remove_all_anim_curves</span><span class="p">()</span>
+    <span class="n">clean_all_meshes</span><span class="p">()</span>
+    <span class="n">remove_all_cameras</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

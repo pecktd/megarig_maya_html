@@ -44,7 +44,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../megarig_maya.html">megarig_maya package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
 </ul>
 
         </div>
@@ -73,6 +73,7 @@
              
   <h1>Source code for megarig_maya.core</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Python modules.</span>
+<span class="kn">from</span> <span class="nn">imp</span> <span class="kn">import</span> <span class="n">reload</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">import</span> <span class="nn">dataclasses</span>
@@ -84,6 +85,8 @@
 <span class="c1"># megarig modules.</span>
 <span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">naming_tools</span>
 <span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">curve_param</span>
+
+<span class="n">reload</span><span class="p">(</span><span class="n">curve_param</span><span class="p">)</span>
 
 
 <span class="n">SKIN_SET</span> <span class="o">=</span> <span class="s2">&quot;skin_set&quot;</span>
@@ -158,7 +161,7 @@
     <span class="n">dark_yellow</span> <span class="o">=</span> <span class="mi">25</span>
 
     <span class="n">blue</span> <span class="o">=</span> <span class="mi">6</span>
-    <span class="n">soft_blue</span> <span class="o">=</span> <span class="mi">18</span>
+    <span class="n">soft_blue</span> <span class="o">=</span> <span class="mi">28</span>
     <span class="n">dark_blue</span> <span class="o">=</span> <span class="mi">15</span>
 
     <span class="n">gray</span> <span class="o">=</span> <span class="mi">2</span>
@@ -657,11 +660,11 @@
             <span class="n">shape</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;overrideColor&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rotate_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">ro</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mc</span><span class="o">.</span><span class="n">getAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{node}</span><span class="s2">.rotateOrder&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
 
-    <span class="nd">@rotate_order</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">rotate_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Ro</span><span class="p">]):</span>
+    <span class="nd">@ro</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ro</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Ro</span><span class="p">]):</span>
         <span class="n">mc</span><span class="o">.</span><span class="n">setAttr</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{node}</span><span class="s2">.rotateOrder&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -723,6 +726,10 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parent</span><span class="p">():</span>
                     <span class="n">mc</span><span class="o">.</span><span class="n">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dag.set_parent_at"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.set_parent_at">[docs]</a>    <span class="k">def</span> <span class="nf">set_parent_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;Dag&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">target</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dag.set_pivot"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.Dag.set_pivot">[docs]</a>    <span class="k">def</span> <span class="nf">set_pivot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the rotate and scale pivots to the given pos.&quot;&quot;&quot;</span>
@@ -854,7 +861,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">lockedattr</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">mc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">xform</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">mc</span><span class="o">.</span><span class="n">TagAsController</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ro&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">False</span></div>
 
@@ -1077,11 +1083,11 @@
 
 
 <div class="viewcode-block" id="to_dags"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.to_dags">[docs]</a><span class="k">def</span> <span class="nf">to_dags</span><span class="p">(</span><span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dag</span><span class="p">]:</span>
-    <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">Dag</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">Dag</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="to_components"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.to_components">[docs]</a><span class="k">def</span> <span class="nf">to_components</span><span class="p">(</span><span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-    <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">Component</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">fl</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span></div>
+<div class="viewcode-block" id="to_components"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.to_components">[docs]</a><span class="k">def</span> <span class="nf">to_components</span><span class="p">(</span><span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Component</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">Component</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">fl</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span></div>
 
 
 <div class="viewcode-block" id="create"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dag</span><span class="p">,</span> <span class="n">Node</span><span class="p">]:</span>
@@ -1238,6 +1244,10 @@
 
 <div class="viewcode-block" id="aim_constraint"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.aim_constraint">[docs]</a><span class="k">def</span> <span class="nf">aim_constraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">aimConstraint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ikrp"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.core.ikrp">[docs]</a><span class="k">def</span> <span class="nf">ikrp</span><span class="p">(</span><span class="n">sj</span><span class="p">:</span> <span class="n">Dag</span><span class="p">,</span> <span class="n">ee</span><span class="p">:</span> <span class="n">Dag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dag</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Dag</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">ikHandle</span><span class="p">(</span><span class="n">sj</span><span class="o">=</span><span class="n">sj</span><span class="p">,</span> <span class="n">ee</span><span class="o">=</span><span class="n">ee</span><span class="p">,</span> <span class="n">sol</span><span class="o">=</span><span class="s2">&quot;ikRPsolver&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
 </pre></div>
 
            </div>

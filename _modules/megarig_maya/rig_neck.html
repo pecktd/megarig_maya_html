@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>megarig_maya.rig_neck &mdash; megarig_maya  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            megarig_maya
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">megarig_maya</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">megarig_maya.rig_neck</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for megarig_maya.rig_neck</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">imp</span> <span class="kn">import</span> <span class="n">reload</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="c1"># megarig Modules</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">core</span> <span class="k">as</span> <span class="n">mrc</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">mru</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_base</span>
+<span class="kn">from</span> <span class="nn">megarig_maya</span> <span class="kn">import</span> <span class="n">rig_ribbon_ik</span>
+
+<span class="n">reload</span><span class="p">(</span><span class="n">rig_base</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="NeckRig"><a class="viewcode-back" href="../../megarig_maya.html#megarig_maya.rig_neck.NeckRig">[docs]</a><span class="k">class</span> <span class="nc">NeckRig</span><span class="p">(</span><span class="n">rig_base</span><span class="o">.</span><span class="n">BaseRig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">tip_guide</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">joint_amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">mod_desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">spaces_attrnames</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">skin_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+        <span class="n">still_parent</span><span class="p">:</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Main Groups</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NeckRig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;neck&quot;</span><span class="p">,</span> <span class="n">mod_desc</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Side</span><span class="o">.</span><span class="n">none</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;still&quot;</span><span class="p">,),</span> <span class="s2">&quot;grp&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">still_parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_guide</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Dag</span><span class="p">(</span><span class="n">tip_guide</span><span class="p">)</span>
+
+        <span class="c1"># Joints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guide</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="s2">&quot;jnt&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mru</span><span class="o">.</span><span class="n">create_joint_at</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guide</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;tip&quot;</span><span class="p">,),</span> <span class="s2">&quot;jnt&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">snap_point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tip_guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="n">skin_parent</span><span class="p">)</span>
+
+        <span class="c1"># IK Handle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ikh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">ikrp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="s2">&quot;ikh&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Main Controller</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ofst</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_ori</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_controller</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">double_circle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">guide</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">pntcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">)</span>
+
+        <span class="c1"># Head Space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_spc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="s2">&quot;spc&quot;</span><span class="p">),</span> <span class="s2">&quot;grp&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_spc</span><span class="o">.</span><span class="n">snap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_spc</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ikh</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head_spc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ikh</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_nrj</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_non_roll_joint</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head_spc</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_nrj</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Stretchy IK</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ln</span><span class="o">=</span><span class="s2">&quot;stretch&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;root&quot;</span><span class="p">,),</span> <span class="s2">&quot;pos&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dag</span><span class="p">(</span><span class="n">mrc</span><span class="o">.</span><span class="n">Null</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">,),</span> <span class="s2">&quot;pos&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_pos</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_pos</span><span class="o">.</span><span class="n">set_parent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+
+        <span class="n">mrc</span><span class="o">.</span><span class="n">pntcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_pos</span><span class="p">)</span>
+        <span class="n">mrc</span><span class="o">.</span><span class="n">pntcons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head_spc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_pos</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;distanceBetween&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,),</span> <span class="s2">&quot;dist&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_pos</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;p1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_pos</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;p2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orig_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_div</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;multiplyDivide&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;at&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;str&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;div&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_div</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;op&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Op</span><span class="o">.</span><span class="n">divide</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">at_str_div</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1x&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_div</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2x&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_len</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_mult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;multDoubleLinear&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;at&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;str&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;mult&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_div</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ox&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">at_str_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_len</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;condition&quot;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;at&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;str&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;cond&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_cond</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;op&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Op</span><span class="o">.</span><span class="n">greater_than</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">at_str_cond</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ft&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_cond</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;st&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_cond</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;cfr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">at_str_cond</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ctr&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_blend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;blendTwoAttr&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;at&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span><span class="p">),</span> <span class="s2">&quot;blend&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auto_stretch_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">at_str_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ab&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i[0]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_cond</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ocr&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">at_str_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i[1]&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_mult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;multDoubleLinear&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">,),</span> <span class="s2">&quot;mult&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_attr</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span>
+            <span class="n">mrc</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;addDoubleLinear&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">),</span> <span class="s2">&quot;add&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_mult</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_add</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">at_str_blend</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_add</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;i2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_add</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;ty&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Ribbon IK</span>
+        <span class="k">if</span> <span class="n">joint_amount</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ribik</span> <span class="o">=</span> <span class="n">rig_ribbon_ik</span><span class="o">.</span><span class="n">RibbonIk</span><span class="p">(</span>
+                <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">,</span>
+                <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">head_nrj</span><span class="p">,</span>
+                <span class="n">root_tg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">,</span>
+                <span class="n">end_tg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tip_jnt</span><span class="p">,</span>
+                <span class="n">parent_tg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">jnt_amt</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                <span class="n">side</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+                <span class="n">mod_name</span><span class="o">=</span><span class="s2">&quot;ik_neck&quot;</span><span class="p">,</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">ctrl_shp</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">double_circle</span><span class="p">,</span>
+                <span class="n">dtl_ctrl_shp</span><span class="o">=</span><span class="n">mrc</span><span class="o">.</span><span class="n">Cp</span><span class="o">.</span><span class="n">none</span><span class="p">,</span>
+                <span class="n">ctrl_clr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dark_color</span><span class="p">,</span>
+                <span class="n">dtl_clr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+                <span class="n">skin_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jnt</span><span class="p">,</span>
+                <span class="n">still_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">still_grp</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head_nrj</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;twist&quot;</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ribik</span><span class="o">.</span><span class="n">end_twist</span>
+
+        <span class="k">if</span> <span class="n">spaces_attrnames</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_space_blender</span><span class="p">(</span>
+                <span class="n">spaces_attrnames</span><span class="p">,</span>
+                <span class="n">mrc</span><span class="o">.</span><span class="n">oricons</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_zr</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_nodes_to_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ribik</span><span class="o">.</span><span class="n">ribbon</span><span class="o">.</span><span class="n">jnts</span><span class="p">,</span> <span class="n">mrc</span><span class="o">.</span><span class="n">SKIN_SET</span><span class="p">)</span>
+
+        <span class="c1"># RO</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">ro</span> <span class="o">=</span> <span class="n">mrc</span><span class="o">.</span><span class="n">Ro</span><span class="o">.</span><span class="n">xzy</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, peck.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
